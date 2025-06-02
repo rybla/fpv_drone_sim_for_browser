@@ -1,6 +1,23 @@
 # README
 
-## Notes
+## TODO
+
+- [ ] proper controls
+  - [ ] hover mode
+  - [ ] HUD controls layout
+  - [ ] mode 2 controls
+- [ ] drone model
+- [ ] stuff in environment
+  - [ ] outdoor environment
+- [ ] temperature
+- [ ] battery levels
+- [ ] wind (air speed)
+- [ ] HUD
+- [ ] camera delay
+- [x] fpv camera
+- [x] collisions
+
+## Initial Notes
 
 - requiremnts:
   - use three-js for 3D rendering
