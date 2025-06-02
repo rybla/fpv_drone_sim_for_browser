@@ -50,7 +50,7 @@ async function main() {
     0.01,
     100,
   );
-  fpvCamera.position.set(0, 2, 2);
+  fpvCamera.position.set(0, 1, 0);
   const chaseCamera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
@@ -402,6 +402,10 @@ async function main() {
     }
 
     // cameras
+
+    fpvCamera.position.set(dronePos.x, dronePos.y, dronePos.z);
+    fpvCamera.quaternion.set(droneRot.x, droneRot.y, droneRot.z, droneRot.w);
+
     chaseCamera.position.set(dronePos.x, dronePos.y + 2, dronePos.z + 3);
     chaseCamera.lookAt(dronePos.x, dronePos.y, dronePos.z);
 
