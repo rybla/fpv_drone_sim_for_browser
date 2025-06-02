@@ -94,15 +94,53 @@ async function main() {
   // drone
   // ---------------------------------------------------------------------------
 
-  const BoxGeometry = new THREE.BoxGeometry(1, 1, 1);
   const droneMaterial = new THREE.MeshStandardMaterial({
     color: 0xff00ff,
     roughness: 0.5,
     metalness: 0.1,
   });
-  const droneMesh = new THREE.Mesh(BoxGeometry, droneMaterial);
-  droneMesh.castShadow = true;
-  scene.add(droneMesh);
+
+  const droneGroup = new THREE.Group();
+  scene.add(droneGroup);
+
+  // chassis
+  const chassisGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.6);
+  const chassisMesh = new THREE.Mesh(chassisGeometry, droneMaterial);
+  chassisMesh.castShadow = true;
+  droneGroup.add(chassisMesh);
+
+  // arms
+  const armLength = 0.8;
+  const armThickness = 0.05;
+  const armXGeometry = new THREE.BoxGeometry(armLength, armThickness, armThickness);
+  const armXMesh = new THREE.Mesh(armXGeometry, droneMaterial);
+  armXMesh.castShadow = true;
+  droneGroup.add(armXMesh);
+
+  const armZGeometry = new THREE.BoxGeometry(armThickness, armThickness, armLength);
+  const armZMesh = new THREE.Mesh(armZGeometry, droneMaterial);
+  armZMesh.castShadow = true;
+  droneGroup.add(armZMesh);
+
+  // propellers
+  const propellers: THREE.Mesh[] = [];
+  const propGeometry = new THREE.CylinderGeometry(0.12, 0.12, 0.02, 16);
+  const propMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+  const propPositions = [
+    [armLength / 2, 0.05, 0],
+    [-armLength / 2, 0.05, 0],
+    [0, 0.05, armLength / 2],
+    [0, 0.05, -armLength / 2],
+  ];
+  for (const pos of propPositions) {
+    const prop = new THREE.Mesh(propGeometry, propMaterial);
+    prop.castShadow = true;
+    prop.position.set(pos[0], pos[1], pos[2]);
+    droneGroup.add(prop);
+    propellers.push(prop);
+  }
+
+  const droneMesh = droneGroup;
   const droneBody = world.createRigidBody(
     RigidBodyDesc.dynamic()
       .setTranslation(0.0, 1.0, -2.0)
@@ -320,6 +358,11 @@ async function main() {
     const droneRot = droneBody.rotation();
     droneMesh.position.set(dronePos.x, dronePos.y, dronePos.z);
     droneMesh.quaternion.set(droneRot.x, droneRot.y, droneRot.z, droneRot.w);
+
+    // spin propellers based on throttle
+    for (const prop of propellers) {
+      prop.rotation.y += controls.throttle * 20 * deltaTime;
+    }
 
     // cameras
     chaseCamera.position.set(dronePos.x, dronePos.y + 2, dronePos.z + 3);
