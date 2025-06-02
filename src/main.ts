@@ -91,31 +91,33 @@ async function main() {
   });
 
   // ---------------------------------------------------------------------------
-  // box
+  // drone
   // ---------------------------------------------------------------------------
 
-  const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-  const boxMaterial = new THREE.MeshStandardMaterial({
+  const BoxGeometry = new THREE.BoxGeometry(1, 1, 1);
+  const droneMaterial = new THREE.MeshStandardMaterial({
     color: 0xff00ff,
     roughness: 0.5,
     metalness: 0.1,
   });
-  const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
-  boxMesh.castShadow = true;
-  scene.add(boxMesh);
-  const boxBody = world.createRigidBody(
+  const droneMesh = new THREE.Mesh(BoxGeometry, droneMaterial);
+  droneMesh.castShadow = true;
+  scene.add(droneMesh);
+  const droneBody = world.createRigidBody(
     RigidBodyDesc.dynamic()
       .setTranslation(0.0, 1.0, -2.0)
       .setLinvel(0.0, 0.0, 0.0)
       .setAngvel(new Vector3(0.0, 0.0, 0.0))
       .setCcdEnabled(true),
   );
-  const boxCol = world.createCollider(
+
+  // droneCol
+  world.createCollider(
     ColliderDesc.cuboid(0.5, 0.5, 0.5)
       .setMass(0.065)
       .setRestitution(0.2)
       .setFriction(0.5),
-    boxBody,
+    droneBody,
   );
 
   // ---------------------------------------------------------------------------
@@ -221,10 +223,10 @@ async function main() {
 
     // Reset position
     if (keys["r"]) {
-      boxBody.setTranslation({ x: 0, y: 1, z: 0 }, true);
-      boxBody.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
-      boxBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
-      boxBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
+      droneBody.setTranslation({ x: 0, y: 1, z: 0 }, true);
+      droneBody.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
+      droneBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      droneBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
     }
 
     // Camera switching
@@ -260,12 +262,12 @@ async function main() {
 
     while (accumulator >= fixedTimeStep) {
       // Reset forces
-      boxBody.resetForces(true);
-      boxBody.resetTorques(true);
+      droneBody.resetForces(true);
+      droneBody.resetTorques(true);
 
       // Calculate thrust
       const thrustMagnitude = controls.throttle * maxThrust;
-      const rotation = boxBody.rotation();
+      const rotation = droneBody.rotation();
 
       // Transform local up vector to world space
       const localUp = new THREE.Vector3(0, 1, 0);
@@ -284,7 +286,7 @@ async function main() {
         y: worldUp.y * thrustMagnitude,
         z: worldUp.z * thrustMagnitude,
       };
-      boxBody.addForce(thrustVector, true);
+      droneBody.addForce(thrustVector, true);
 
       // Calculate torques in local space
       const pitchTorque = controls.pitch * maxPitchTorque;
@@ -295,7 +297,7 @@ async function main() {
       const localTorque = new THREE.Vector3(pitchTorque, yawTorque, rollTorque);
       const worldTorque = localTorque.clone().applyQuaternion(quaternion);
 
-      boxBody.addTorque(
+      droneBody.addTorque(
         {
           x: worldTorque.x,
           y: worldTorque.y,
@@ -313,18 +315,18 @@ async function main() {
     // graphics
     // ---------------------------------------------------------------------------
 
-    // box
-    const boxPos = boxBody.translation();
-    const boxRot = boxBody.rotation();
-    boxMesh.position.set(boxPos.x, boxPos.y, boxPos.z);
-    boxMesh.quaternion.set(boxRot.x, boxRot.y, boxRot.z, boxRot.w);
+    // drone
+    const dronePos = droneBody.translation();
+    const droneRot = droneBody.rotation();
+    droneMesh.position.set(dronePos.x, dronePos.y, dronePos.z);
+    droneMesh.quaternion.set(droneRot.x, droneRot.y, droneRot.z, droneRot.w);
 
     // cameras
-    chaseCamera.position.set(boxPos.x, boxPos.y + 2, boxPos.z + 3);
-    chaseCamera.lookAt(boxPos.x, boxPos.y, boxPos.z);
+    chaseCamera.position.set(dronePos.x, dronePos.y + 2, dronePos.z + 3);
+    chaseCamera.lookAt(dronePos.x, dronePos.y, dronePos.z);
 
-    topCamera.position.set(boxPos.x, 10, boxPos.z);
-    topCamera.lookAt(boxPos.x, boxPos.y, boxPos.z);
+    topCamera.position.set(dronePos.x, 10, dronePos.z);
+    topCamera.lookAt(dronePos.x, dronePos.y, dronePos.z);
 
     // ---------------------------------------------------------------------------
     // render scene
