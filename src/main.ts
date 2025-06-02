@@ -22,16 +22,23 @@ async function main() {
 
   const scene = new THREE.Scene();
 
-  // // ---------------------------------------------------------------------------
-  // // skybox
-  // // ---------------------------------------------------------------------------
-  // const loader = new THREE.CubeTextureLoader();
-  // const skybox = loader
-  //   .setPath("/assets/skybox/")
-  //   .load(["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"]);
+  // ---------------------------------------------------------------------------
+  // skybox
+  // ---------------------------------------------------------------------------
+  const loader = new THREE.CubeTextureLoader();
+  const skybox = loader
+    .setPath("/")
+    .load([
+      "nightsky_rt.png",
+      "nightsky_lf.png",
+      "nightsky_up.png",
+      "nightsky_dn.png",
+      "nightsky_bk.png",
+      "nightsky_ft.png",
+    ]);
 
-  // scene.background = skybox; // shows in the backdrop
-  // scene.environment = skybox; // lets reflective materials pick it up
+  scene.background = skybox; // shows in the backdrop
+  scene.environment = skybox; // lets reflective materials pick it up
 
   // ---------------------------------------------------------------------------
   // camera
