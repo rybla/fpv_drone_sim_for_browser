@@ -25,7 +25,6 @@ All merge requests should build without ANY type errors.
   - [ ] hover mode
   - [ ] HUD controls layout
   - [ ] mode 2 controls
-- [ ] drone model
 - [ ] stuff in environment
   - [ ] outdoor environment
 - [ ] temperature
@@ -33,6 +32,7 @@ All merge requests should build without ANY type errors.
 - [ ] wind (air speed)
 - [ ] HUD
 - [ ] camera delay
+- [x] drone model
 - [x] fpv camera
 - [x] collisions
 

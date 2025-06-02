@@ -22,6 +22,17 @@ async function main() {
 
   const scene = new THREE.Scene();
 
+  // // ---------------------------------------------------------------------------
+  // // skybox
+  // // ---------------------------------------------------------------------------
+  // const loader = new THREE.CubeTextureLoader();
+  // const skybox = loader
+  //   .setPath("/assets/skybox/")
+  //   .load(["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"]);
+
+  // scene.background = skybox; // shows in the backdrop
+  // scene.environment = skybox; // lets reflective materials pick it up
+
   // ---------------------------------------------------------------------------
   // camera
   // ---------------------------------------------------------------------------
@@ -113,12 +124,20 @@ async function main() {
   // arms
   const armLength = 0.8;
   const armThickness = 0.05;
-  const armXGeometry = new THREE.BoxGeometry(armLength, armThickness, armThickness);
+  const armXGeometry = new THREE.BoxGeometry(
+    armLength,
+    armThickness,
+    armThickness,
+  );
   const armXMesh = new THREE.Mesh(armXGeometry, droneMaterial);
   armXMesh.castShadow = true;
   droneGroup.add(armXMesh);
 
-  const armZGeometry = new THREE.BoxGeometry(armThickness, armThickness, armLength);
+  const armZGeometry = new THREE.BoxGeometry(
+    armThickness,
+    armThickness,
+    armLength,
+  );
   const armZMesh = new THREE.Mesh(armZGeometry, droneMaterial);
   armZMesh.castShadow = true;
   droneGroup.add(armZMesh);
