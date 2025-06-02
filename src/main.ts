@@ -75,34 +75,11 @@ async function main() {
   const targetControls = { ...controls };
   const keys: { [key: string]: boolean } = {};
 
-  // Telemetry
-  // let batteryLevel = 100;
-  // let batteryVoltage = 8.4;
-  // let flightStartTime = Date.now();
-  // const batteryCapacity = 350; // mAh
-
   // Physics constants
   const maxThrust = 1.28; // N (2x hover thrust)
-  const hoverThrust = 0.64; // N (mg)
   const maxPitchTorque = 0.015;
   const maxRollTorque = 0.015;
   const maxYawTorque = 0.008;
-
-  // Motor mixing
-  function calculateMotorThrusts() {
-    const t = controls.throttle;
-    const p = controls.pitch;
-    const r = controls.roll;
-    const y = controls.yaw;
-
-    // X configuration mixing
-    const m1 = Math.max(0, Math.min(1, t - r + p + y));
-    const m2 = Math.max(0, Math.min(1, t + r - p + y));
-    const m3 = Math.max(0, Math.min(1, t + r + p - y));
-    const m4 = Math.max(0, Math.min(1, t - r - p - y));
-
-    return [m1, m2, m3, m4];
-  }
 
   // Input handling
   window.addEventListener("keydown", (e) => {
@@ -213,7 +190,6 @@ async function main() {
     // ---------------------------------------------------------------------------
 
     // Handle input
-    const inputSpeed = 2.0;
     const throttleSpeed = 1.0;
 
     // Throttle (up/down arrows)
