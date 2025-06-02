@@ -1,5 +1,11 @@
 # README
 
+## Setup
+
+```
+npm install
+```
+
 ## TODO
 
 - [ ] proper controls
