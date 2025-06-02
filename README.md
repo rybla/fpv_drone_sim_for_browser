@@ -1,10 +1,23 @@
 # README
 
+This project uses TypeScript, [Three JS](https://threejs.org/) for graphics, and [Rapier](https://rapier.rs/) (via the NPM package [@dimforge/rapier3d
+](https://www.npmjs.com/package/@dimforge/rapier3d]) for physics.
+
 ## Setup
 
-```
+To install dependencies:
+
+```sh
 npm install
 ```
+
+To run the development server:
+
+```sh
+npm dev
+```
+
+All merge requests should build without ANY type errors.
 
 ## TODO
 
@@ -26,6 +39,7 @@ npm install
 ## Initial Notes
 
 - requiremnts:
+
   - use three-js for 3D rendering
   - import environments and 3D models
   - physics:
