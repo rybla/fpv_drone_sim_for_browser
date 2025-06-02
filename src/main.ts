@@ -118,7 +118,6 @@ async function main() {
   // ---------------------------------------------------------------------------
 
   const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-  // const boxMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
   const boxMaterial = new THREE.MeshStandardMaterial({
     color: 0xff00ff,
     roughness: 0.5,
@@ -146,7 +145,6 @@ async function main() {
   // floor
   // ---------------------------------------------------------------------------
 
-  // const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
   const floorMaterial = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     roughness: 0.5,
@@ -172,6 +170,8 @@ async function main() {
   const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
   directionalLight.position.set(5, 10, 5);
   directionalLight.castShadow = true;
+  directionalLight.shadow.mapSize.width = 1024;
+  directionalLight.shadow.mapSize.height = 1024;
   directionalLight.shadow.camera.near = 0.1;
   directionalLight.shadow.camera.far = 50;
   directionalLight.shadow.camera.left = -20;
