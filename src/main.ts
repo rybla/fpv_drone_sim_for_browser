@@ -94,10 +94,11 @@ async function main() {
   // drone
   // ---------------------------------------------------------------------------
 
+  // Use a darker metallic material so the lighting has nicer highlights
   const droneMaterial = new THREE.MeshStandardMaterial({
-    color: 0xff00ff,
-    roughness: 0.5,
-    metalness: 0.1,
+    color: 0x555555,
+    roughness: 0.3,
+    metalness: 0.7,
   });
 
   const droneGroup = new THREE.Group();
@@ -162,10 +163,11 @@ async function main() {
   // floor
   // ---------------------------------------------------------------------------
 
+  // Slightly rough concrete-like floor material
   const floorMaterial = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    roughness: 0.5,
-    metalness: 0.1,
+    color: 0x808080,
+    roughness: 0.8,
+    metalness: 0.2,
   });
   const floorGeometry = new THREE.BoxGeometry(30, 0.2, 30);
   floorGeometry.computeVertexNormals();
@@ -181,10 +183,13 @@ async function main() {
   // lighting
   // ---------------------------------------------------------------------------
 
-  const ambientLight = new THREE.AmbientLight(0x404040, 0.2);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
   scene.add(ambientLight);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+  scene.add(hemiLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
   directionalLight.position.set(5, 10, 5);
   directionalLight.castShadow = true;
   directionalLight.shadow.mapSize.width = 1024;
@@ -197,12 +202,12 @@ async function main() {
   directionalLight.shadow.camera.bottom = -20;
   scene.add(directionalLight);
 
-  // Point lights for indoor feel
-  const pointLight1 = new THREE.PointLight(0xffaa00, 0.5);
+  // Additional point lights to softly illuminate the scene
+  const pointLight1 = new THREE.PointLight(0xffffff, 0.6);
   pointLight1.position.set(5, 3, 5);
   scene.add(pointLight1);
 
-  const pointLight2 = new THREE.PointLight(0x00aaff, 0.3);
+  const pointLight2 = new THREE.PointLight(0xffffff, 0.6);
   pointLight2.position.set(-5, 3, -5);
   scene.add(pointLight2);
 
