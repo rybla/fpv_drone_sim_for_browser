@@ -75,9 +75,14 @@ async function main() {
   // controls
   // ---------------------------------------------------------------------------
 
+  // Physics constants
+  const droneMass = 0.065;
+  const maxThrust = 1.28; // N (2x hover thrust)
+  const hoverThrottle = (droneMass * 9.81) / maxThrust;
+
   // Control inputs
   const controls = {
-    throttle: 0,
+    throttle: hoverThrottle,
     pitch: 0,
     roll: 0,
     yaw: 0,
@@ -86,8 +91,6 @@ async function main() {
   const targetControls = { ...controls };
   const keys: { [key: string]: boolean } = {};
 
-  // Physics constants
-  const maxThrust = 1.28; // N (2x hover thrust)
   const maxPitchTorque = 0.015;
   const maxRollTorque = 0.015;
   const maxYawTorque = 0.008;
@@ -172,7 +175,7 @@ async function main() {
   // droneCol
   world.createCollider(
     ColliderDesc.cuboid(0.5, 0.5, 0.5)
-      .setMass(0.065)
+      .setMass(droneMass)
       .setRestitution(0.2)
       .setFriction(0.5),
     droneBody,
@@ -257,16 +260,19 @@ async function main() {
     const throttleSpeed = 1.0;
 
     // Throttle (up/down arrows)
-    if (keys["arrowup"])
+    if (keys["arrowup"]) {
       targetControls.throttle = Math.min(
         1,
         targetControls.throttle + throttleSpeed * deltaTime,
       );
-    if (keys["arrowdown"])
+    } else if (keys["arrowdown"]) {
       targetControls.throttle = Math.max(
         0,
         targetControls.throttle - throttleSpeed * deltaTime,
       );
+    } else {
+      targetControls.throttle = hoverThrottle;
+    }
 
     // Pitch (W/S)
     targetControls.pitch = 0;
