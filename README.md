@@ -2,11 +2,11 @@
 
 ## TODO
 
+- [ ] drone model
 - [ ] proper controls
   - [ ] hover mode
   - [ ] HUD controls layout
   - [ ] mode 2 controls
-- [ ] drone model
 - [ ] stuff in environment
   - [ ] outdoor environment
 - [ ] temperature

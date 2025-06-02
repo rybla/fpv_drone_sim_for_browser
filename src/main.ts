@@ -94,31 +94,174 @@ async function main() {
   // drone
   // ---------------------------------------------------------------------------
 
-  const BoxGeometry = new THREE.BoxGeometry(1, 1, 1);
-  const droneMaterial = new THREE.MeshStandardMaterial({
-    color: 0xff00ff,
+  // const BoxGeometry = new THREE.BoxGeometry(1, 1, 1);
+  // const droneMaterial = new THREE.MeshStandardMaterial({
+  //   color: 0xff00ff,
+  //   roughness: 0.5,
+  //   metalness: 0.1,
+  // });
+  // const droneMesh = new THREE.Mesh(BoxGeometry, droneMaterial);
+  // droneMesh.castShadow = true;
+  // scene.add(droneMesh);
+  // const droneBody = world.createRigidBody(
+  //   RigidBodyDesc.dynamic()
+  //     .setTranslation(0.0, 1.0, -2.0)
+  //     .setLinvel(0.0, 0.0, 0.0)
+  //     .setAngvel(new Vector3(0.0, 0.0, 0.0))
+  //     .setCcdEnabled(true),
+  // );
+
+  // // droneCol
+  // world.createCollider(
+  //   ColliderDesc.cuboid(0.5, 0.5, 0.5)
+  //     .setMass(0.065)
+  //     .setRestitution(0.2)
+  //     .setFriction(0.5),
+  //   droneBody,
+  // );
+
+  // HERE
+  //
+  // Create detailed drone model
+  const droneMesh = new THREE.Group();
+
+  // Main body (central hub)
+  const mainBodyGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.08, 8);
+  const mainBodyMaterial = new THREE.MeshStandardMaterial({
+    color: 0x2c3e50,
+    roughness: 0.3,
+    metalness: 0.7,
+  });
+  const centralBody = new THREE.Mesh(mainBodyGeometry, mainBodyMaterial);
+  centralBody.castShadow = true;
+  droneMesh.add(centralBody);
+
+  // Battery compartment
+  const batteryGeometry = new THREE.BoxGeometry(0.12, 0.04, 0.08);
+  const batteryMaterial = new THREE.MeshStandardMaterial({
+    color: 0x34495e,
     roughness: 0.5,
+    metalness: 0.3,
+  });
+  const batteryPack = new THREE.Mesh(batteryGeometry, batteryMaterial);
+  batteryPack.position.y = 0.02;
+  batteryPack.castShadow = true;
+  droneMesh.add(batteryPack);
+
+  // Create arms and rotors
+  const armMaterial = new THREE.MeshStandardMaterial({
+    color: 0xe74c3c,
+    roughness: 0.4,
+    metalness: 0.2,
+  });
+  const motorMaterial = new THREE.MeshStandardMaterial({
+    color: 0x7f8c8d,
+    roughness: 0.3,
+    metalness: 0.8,
+  });
+  const propellerMaterial = new THREE.MeshStandardMaterial({
+    color: 0x2c3e50,
+    roughness: 0.6,
+    metalness: 0.1,
+    transparent: true,
+    opacity: 0.8,
+  });
+
+  // Arm and rotor positions
+  const motorPositions: THREE.Vector3[] = [
+    new THREE.Vector3(0.25, 0, 0.25), // front right
+    new THREE.Vector3(-0.25, 0, 0.25), // front left
+    new THREE.Vector3(0.25, 0, -0.25), // back right
+    new THREE.Vector3(-0.25, 0, -0.25), // back left
+  ];
+
+  const propellerGroups: THREE.Group[] = [];
+
+  motorPositions.forEach((pos: THREE.Vector3, index: number) => {
+    // Arm
+    const armGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.35, 6);
+    const droneArm = new THREE.Mesh(armGeometry, armMaterial);
+
+    // Calculate arm rotation to point towards motor position
+    const armAngle: number = Math.atan2(pos.x, pos.z);
+    droneArm.rotation.z = Math.PI / 2;
+    droneArm.rotation.y = armAngle;
+    droneArm.position.set(pos.x * 0.5, 0, pos.z * 0.5);
+    droneArm.castShadow = true;
+    droneMesh.add(droneArm);
+
+    // Motor housing
+    const motorHousingGeometry = new THREE.CylinderGeometry(
+      0.04,
+      0.04,
+      0.06,
+      8,
+    );
+    const motorHousing = new THREE.Mesh(motorHousingGeometry, motorMaterial);
+    motorHousing.position.copy(pos);
+    motorHousing.position.y = 0.03;
+    motorHousing.castShadow = true;
+    droneMesh.add(motorHousing);
+
+    // Propeller group (for spinning animation later)
+    const propellerGroup = new THREE.Group();
+    propellerGroup.position.copy(pos);
+    propellerGroup.position.y = 0.08;
+
+    // Propeller hub
+    const hubGeometry = new THREE.CylinderGeometry(0.015, 0.015, 0.02, 6);
+    const propellerHub = new THREE.Mesh(hubGeometry, motorMaterial);
+    propellerGroup.add(propellerHub);
+
+    // Propeller blades
+    const bladeGeometry = new THREE.BoxGeometry(0.3, 0.002, 0.03);
+    const propellerBlade1 = new THREE.Mesh(bladeGeometry, propellerMaterial);
+    propellerBlade1.position.y = 0.012;
+    propellerBlade1.castShadow = true;
+    propellerGroup.add(propellerBlade1);
+
+    const propellerBlade2 = new THREE.Mesh(bladeGeometry, propellerMaterial);
+    propellerBlade2.rotation.y = Math.PI / 2;
+    propellerBlade2.position.y = 0.012;
+    propellerBlade2.castShadow = true;
+    propellerGroup.add(propellerBlade2);
+
+    droneMesh.add(propellerGroup);
+    propellerGroups.push(propellerGroup);
+  });
+
+  // LED indicators
+  const ledMaterial = new THREE.MeshStandardMaterial({
+    color: 0x00ff00,
+    emissive: 0x004400,
+    roughness: 0.1,
     metalness: 0.1,
   });
-  const droneMesh = new THREE.Mesh(BoxGeometry, droneMaterial);
-  droneMesh.castShadow = true;
-  scene.add(droneMesh);
-  const droneBody = world.createRigidBody(
-    RigidBodyDesc.dynamic()
-      .setTranslation(0.0, 1.0, -2.0)
-      .setLinvel(0.0, 0.0, 0.0)
-      .setAngvel(new Vector3(0.0, 0.0, 0.0))
-      .setCcdEnabled(true),
-  );
+  const ledGeometry = new THREE.SphereGeometry(0.01, 8, 8);
 
-  // droneCol
-  world.createCollider(
-    ColliderDesc.cuboid(0.5, 0.5, 0.5)
-      .setMass(0.065)
-      .setRestitution(0.2)
-      .setFriction(0.5),
-    droneBody,
-  );
+  // Front LEDs (green)
+  const frontLed1 = new THREE.Mesh(ledGeometry, ledMaterial);
+  frontLed1.position.set(0.05, 0.02, 0.14);
+  droneMesh.add(frontLed1);
+
+  const frontLed2 = new THREE.Mesh(ledGeometry, ledMaterial);
+  frontLed2.position.set(-0.05, 0.02, 0.14);
+  droneMesh.add(frontLed2);
+
+  // Back LEDs (red)
+  const backLedMaterial = new THREE.MeshStandardMaterial({
+    color: 0xff0000,
+    emissive: 0x440000,
+    roughness: 0.1,
+    metalness: 0.1,
+  });
+  const backLed1 = new THREE.Mesh(ledGeometry, backLedMaterial);
+  backLed1.position.set(0.05, 0.02, -0.14);
+  droneMesh.add(backLed1);
+
+  const backLed2 = new THREE.Mesh(ledGeometry, backLedMaterial);
+  backLed2.position.set(-0.05, 0.02, -0.14);
+  droneMesh.add(backLed2);
 
   // ---------------------------------------------------------------------------
   // floor
