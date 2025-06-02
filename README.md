@@ -21,6 +21,8 @@ All merge requests should build without ANY type errors.
 
 ## TODO
 
+- [ ] real fpv cam
+- [ ] better skybox
 - [ ] proper controls
   - [ ] hover mode
   - [ ] HUD controls layout
