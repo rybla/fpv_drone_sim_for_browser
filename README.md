@@ -24,6 +24,7 @@ All merge requests should build without ANY type errors.
 - [ ] better skybox
 - [ ] proper controls
   - [ ] hover mode
+    - [ ] needs to take into account rotation of drone
   - [ ] HUD controls layout
   - [ ] mode 2 controls
 - [ ] stuff in environment
