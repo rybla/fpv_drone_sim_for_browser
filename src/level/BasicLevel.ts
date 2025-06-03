@@ -3,6 +3,9 @@ import * as THREE from "three";
 import * as config from "../config";
 import Level from "./Level";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { createTank } from "../environment/tank";
+import { createTU95 } from "../environment/tu95";
+import { createBarrier } from "../environment/barrier";
 
 export default class BasicLevel extends Level {
   fpvCamera: THREE.PerspectiveCamera;
@@ -59,6 +62,7 @@ export default class BasicLevel extends Level {
     this.createHUD();
     this.createFloor();
     this.createSkybox();
+    createTU95(this.scene, this.world, new THREE.Vector3(15, 5, 5));
   }
 
   createSkybox() {
@@ -510,4 +514,7 @@ export default class BasicLevel extends Level {
     this.topCamera.position.set(dronePos.x, 10, dronePos.z);
     this.topCamera.lookAt(dronePos.x, dronePos.y, dronePos.z);
   }
+}
+function createLowPolyDrone(scene: any, world: any, arg2: THREE.Vector3) {
+  throw new Error("Function not implemented.");
 }
