@@ -11,6 +11,9 @@ export default class BasicLevel extends Level {
   topCamera: THREE.PerspectiveCamera;
 
   batteryLevel: number;
+  batteryOverheatTemperature: number;
+  batteryTemperature: number;
+  batteryOverheated: boolean;
 
   windVector: THREE.Vector3;
   targetWindVector: THREE.Vector3;
@@ -88,6 +91,8 @@ export default class BasicLevel extends Level {
 
     // battery
     this.batteryLevel = 100;
+    this.batteryOverheatTemperature = 140;
+    this.batteryOverheated = false;
 
     // wind
     this.windVector = new THREE.Vector3(0, 0, 0);
@@ -100,6 +105,7 @@ export default class BasicLevel extends Level {
     this.targetEnvironmentTemperature = 70;
     this.environmentTemperatureChangeTimer = 0;
     this.environmentTemperatureChangeInterval = 10; // seconds between temperature changes
+    this.batteryTemperature = this.environmentTemperature;
 
     // ping delay
     this.pingDelay = Math.random() * 50 + 50; // 50-100ms
@@ -217,7 +223,31 @@ export default class BasicLevel extends Level {
     this.updateTemperature(deltaTime);
     this.updatePing(deltaTime);
     this.updateBattery(deltaTime);
-    this.updatePhysics(deltaTime);
+
+    const motorsActive =
+      this.controls.throttle > 0 &&
+      this.batteryLevel > 0 &&
+      !this.batteryOverheated;
+    const tempChangeRate = 10;
+    if (motorsActive) {
+      this.batteryTemperature += tempChangeRate * deltaTime;
+    } else {
+      this.batteryTemperature -= tempChangeRate * deltaTime;
+      if (this.batteryTemperature < this.environmentTemperature) {
+        this.batteryTemperature = this.environmentTemperature;
+      }
+    }
+
+    if (this.batteryTemperature >= this.batteryOverheatTemperature) {
+      this.batteryOverheated = true;
+    }
+
+    if (!this.batteryOverheated) {
+      this.updatePhysics(deltaTime);
+    } else {
+      this.controls.throttle = 0;
+      this.targetControls.throttle = 0;
+    }
     this.updateGraphics(deltaTime);
     this.updateHUD(deltaTime);
   }
@@ -232,7 +262,9 @@ export default class BasicLevel extends Level {
 
       // Calculate thrust
       const thrustMagnitude =
-        this.batteryLevel > 0 ? this.controls.throttle * config.maxThrust : 0;
+        this.batteryLevel > 0 && !this.batteryOverheated
+          ? this.controls.throttle * config.maxThrust
+          : 0;
       const rotation = this.drone!.body.rotation();
 
       // Transform local up vector to world space
@@ -586,6 +618,13 @@ export default class BasicLevel extends Level {
     document.getElementById("temperature")!.textContent =
       `${Math.round(this.environmentTemperature)}°F`;
 
+    // Battery temperature and overheat status
+    document.getElementById("battery-temp")!.textContent =
+      `${Math.round(this.batteryTemperature)}°F`;
+    const overheatElem = document.getElementById("battery-overheated")!;
+    overheatElem.textContent = this.batteryOverheated ? "YES" : "NO";
+    overheatElem.style.color = this.batteryOverheated ? "#ff0000" : "#00ff00";
+
     // Update motor thrust bars
     // Calculate motor speeds based on control inputs (same mixing as propellers)
     const base = this.controls.throttle;
@@ -647,7 +686,6 @@ export default class BasicLevel extends Level {
     const settingsButton = document.getElementById("settings-button");
     const settingsMenu = document.getElementById("settings-menu");
     const settingsBack = document.getElementById("settings-back");
-    const pauseMenu = document.getElementById("pause-menu");
 
     settingsButton?.addEventListener("click", (e) => {
       e.stopPropagation();
