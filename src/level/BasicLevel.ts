@@ -18,6 +18,11 @@ export default class BasicLevel extends Level {
 
   batteryLevel: number;
 
+  windVector: THREE.Vector3;
+  targetWindVector: THREE.Vector3;
+  windChangeTimer: number;
+  windChangeInterval: number;
+
   drone: {
     body: RAPIER.RigidBody;
     group: THREE.Group;
@@ -55,6 +60,12 @@ export default class BasicLevel extends Level {
 
     // battery
     this.batteryLevel = 100;
+
+    // wind
+    this.windVector = new THREE.Vector3(0, 0, 0);
+    this.targetWindVector = new THREE.Vector3(0, 0, 0);
+    this.windChangeTimer = 0;
+    this.windChangeInterval = 8; // seconds between wind target changes
 
     // create stuff
     this.drone = this.createDrone();
@@ -169,6 +180,14 @@ export default class BasicLevel extends Level {
         <span class="hud-label">BATTERY</span>
         <span class="hud-value" id="battery">100%</span>
       </div>
+      <div class="hud-item">
+        <span class="hud-label">WIND SPEED</span>
+        <span class="hud-value" id="windspeed">0.0 m/s</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">WIND DIR</span>
+        <span class="hud-value" id="winddir">0°</span>
+      </div>
     `;
     document.body.appendChild(hudContainer);
     // Add HUD styles
@@ -253,6 +272,7 @@ export default class BasicLevel extends Level {
   update(deltaTime: number): void {
     super.update(deltaTime);
     this.updateControls(deltaTime);
+    this.updateWind(deltaTime);
     this.updateBattery(deltaTime);
     this.updatePhysics(deltaTime);
     this.updateGraphics(deltaTime);
@@ -288,6 +308,17 @@ export default class BasicLevel extends Level {
         z: worldUp.z * thrustMagnitude,
       };
       this.drone.body.addForce(thrustVector, true);
+
+      /// Apply wind velocity
+      const currentVel = this.drone.body.linvel();
+      this.drone.body.setLinvel(
+        {
+          x: currentVel.x + this.windVector.x * deltaTime,
+          y: currentVel.y,
+          z: currentVel.z + this.windVector.z * deltaTime,
+        },
+        true,
+      );
 
       let finalPitchTorque = this.controls.pitch * config.maxPitchTorque;
       let finalRollTorque = -this.controls.roll * config.maxRollTorque;
@@ -446,6 +477,28 @@ export default class BasicLevel extends Level {
       deltaTime;
   }
 
+  updateWind(deltaTime: number): void {
+    this.windChangeTimer += deltaTime;
+
+    if (this.windChangeTimer >= this.windChangeInterval) {
+      // Generate new gentle wind target
+      const windSpeed = Math.random() * 1 + 0;
+      const windAngle = Math.random() * Math.PI * 2; // random direction
+
+      this.targetWindVector.set(
+        Math.cos(windAngle) * windSpeed,
+        0,
+        Math.sin(windAngle) * windSpeed,
+      );
+
+      this.windChangeTimer = 0;
+    }
+
+    // Smoothly interpolate current wind towards target
+    const windSmoothing = 0.3;
+    this.windVector.lerp(this.targetWindVector, windSmoothing * deltaTime);
+  }
+
   updateBattery(deltaTime: number): void {
     const throttleSquared = this.controls.throttle * this.controls.throttle;
     const drainRate =
@@ -484,6 +537,21 @@ export default class BasicLevel extends Level {
       `${totalVelocity.toFixed(1)} m/s`;
     document.getElementById("groundspeed")!.textContent =
       `${groundSpeed.toFixed(1)} m/s`;
+
+    // Wind
+    const windSpeed = Math.sqrt(
+      this.windVector.x * this.windVector.x +
+        this.windVector.z * this.windVector.z,
+    );
+    const windDirection =
+      (Math.atan2(this.windVector.z, this.windVector.x) * 180) / Math.PI;
+    const normalizedWindDir =
+      windDirection < 0 ? windDirection + 360 : windDirection;
+
+    document.getElementById("windspeed")!.textContent =
+      `${windSpeed.toFixed(1)} m/s`;
+    document.getElementById("winddir")!.textContent =
+      `${normalizedWindDir.toFixed(0)}°`;
   }
 
   updateGraphics(deltaTime: number): void {
