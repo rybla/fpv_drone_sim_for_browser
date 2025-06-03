@@ -112,6 +112,10 @@ async function main() {
       <span class="hud-label">GROUND SPEED</span>
       <span class="hud-value" id="groundspeed">0.0 m/s</span>
     </div>
+    <div class="hud-item">
+      <span class="hud-label">BATTERY</span>
+      <span class="hud-value" id="battery">100%</span>
+    </div>
   `;
   document.body.appendChild(hudContainer);
 
@@ -166,6 +170,11 @@ async function main() {
   };
 
   const targetControls = { ...controls };
+
+  // Battery state
+  let batteryLevel = 100; // percentage
+  const maxFlightTime = 510; // 8.5 minutes in seconds
+
   const keys: { [key: string]: boolean } = {};
 
   const maxPitchTorque = 0.015;
@@ -480,6 +489,7 @@ async function main() {
       droneBody.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
       droneBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
       droneBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
+      batteryLevel = 100;
     }
 
     // Camera switching
@@ -580,6 +590,23 @@ async function main() {
       vel.x * vel.x + vel.y * vel.y + vel.z * vel.z,
     );
     const groundSpeed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
+
+    // Update battery
+    const throttleSquared = controls.throttle * controls.throttle;
+    const drainRate = (100 / maxFlightTime) * (0.5 + throttleSquared * 1.5); // Base drain + throttle-based drain
+    batteryLevel = Math.max(0, batteryLevel - drainRate * deltaTime);
+    document.getElementById("battery")!.textContent =
+      `${Math.floor(batteryLevel)}%`;
+
+    // Battery color based on level
+    const batteryElement = document.getElementById("battery")!;
+    if (batteryLevel > 30) {
+      batteryElement.style.color = "#00ff00";
+    } else if (batteryLevel > 15) {
+      batteryElement.style.color = "#ffaa00";
+    } else {
+      batteryElement.style.color = "#ff0000";
+    }
 
     // Convert quaternion to euler angles
     const euler = new THREE.Euler();
