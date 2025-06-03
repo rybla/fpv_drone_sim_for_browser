@@ -17,9 +17,9 @@ export function createLowPolyDrone(
     // Create a group to hold the plane
     const droneGroup = new THREE.Group();
 
-    // Clone the pre-loaded model if available, otherwise create placeholder
     if (lowPolyDroneModel) {
       const modelClone = lowPolyDroneModel.clone();
+      modelClone.scale.set(0.01, 0.01, 0.01);
       droneGroup.add(modelClone);
 
       // Enable shadows for all meshes in the model
@@ -42,7 +42,7 @@ export function createLowPolyDrone(
 
     // Create collider - adjust dimensions based on your TU-95 model size
     const planeCol = world.createCollider(
-      ColliderDesc.cuboid(5, 3, 10).setTranslation(pos.x, pos.y + 3, pos.z),
+      ColliderDesc.cuboid(1, 1, 1).setTranslation(pos.x, pos.y + 3, pos.z),
     );
   });
 }
