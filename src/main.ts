@@ -10,43 +10,13 @@ import { createBarrier } from "./environment/barrier";
 import { createFloor } from "./environment/floor";
 import { createLighting } from "./environment/lighting";
 import { createTank } from "./environment/tank";
-import { createBasicLevel } from "./level/basic";
 import "./style.css";
 import { createHUD, updateHUD } from "./ui/hud";
+import BasicLevel from "./level/BasicLevel";
 
 async function main() {
   await RAPIER.init();
-  const level = createBasicLevel();
-
-  // ---------------------------------------------------------------------------
-  // camera
-  // ---------------------------------------------------------------------------
-
-  const fpvCamera = new THREE.PerspectiveCamera(
-    100,
-    window.innerWidth / window.innerHeight,
-    0.01,
-    100,
-  );
-  fpvCamera.position.set(0, 1, 0);
-  const chaseCamera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100,
-  );
-  const topCamera = new THREE.PerspectiveCamera(
-    60,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100,
-  );
-  let currentCamera = fpvCamera;
-
-  // ---------------------------------------------------------------------------
-  // hud
-  // ---------------------------------------------------------------------------
-
+  const level = new BasicLevel();
   createHUD();
 
   // ---------------------------------------------------------------------------
@@ -284,15 +254,15 @@ async function main() {
     // Camera switching
     if (level.keys["1"]) {
       console.log("Switching to FPV camera");
-      currentCamera = fpvCamera;
+      level.currentCamera = level.fpvCamera;
     }
     if (level.keys["2"]) {
       console.log("Switching to chase camera");
-      currentCamera = chaseCamera;
+      level.currentCamera = level.chaseCamera;
     }
     if (level.keys["3"]) {
       console.log("Switching to top camera");
-      currentCamera = topCamera;
+      level.currentCamera = level.topCamera;
     }
 
     // Smooth control inputs
@@ -425,20 +395,25 @@ async function main() {
 
     // cameras
 
-    fpvCamera.position.set(dronePos.x, dronePos.y, dronePos.z);
-    fpvCamera.quaternion.set(droneRot.x, droneRot.y, droneRot.z, droneRot.w);
+    level.fpvCamera.position.set(dronePos.x, dronePos.y, dronePos.z);
+    level.fpvCamera.quaternion.set(
+      droneRot.x,
+      droneRot.y,
+      droneRot.z,
+      droneRot.w,
+    );
 
-    chaseCamera.position.set(dronePos.x, dronePos.y + 2, dronePos.z + 3);
-    chaseCamera.lookAt(dronePos.x, dronePos.y, dronePos.z);
+    level.chaseCamera.position.set(dronePos.x, dronePos.y + 2, dronePos.z + 3);
+    level.chaseCamera.lookAt(dronePos.x, dronePos.y, dronePos.z);
 
-    topCamera.position.set(dronePos.x, 10, dronePos.z);
-    topCamera.lookAt(dronePos.x, dronePos.y, dronePos.z);
+    level.topCamera.position.set(dronePos.x, 10, dronePos.z);
+    level.topCamera.lookAt(dronePos.x, dronePos.y, dronePos.z);
 
     // ---------------------------------------------------------------------------
     // render scene
     // ---------------------------------------------------------------------------
 
-    renderer.render(level.scene, currentCamera);
+    level.renderer.render(level.scene, level.currentCamera);
   }
 
   update();
