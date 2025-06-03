@@ -4,8 +4,8 @@ import * as config from "../config";
 import Level from "./Level";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { createTank } from "../environment/tank";
-import { createTU95 } from "../environment/tu95";
 import { createBarrier } from "../environment/barrier";
+import { createTU96 } from "../environment/tu95";
 
 export default class BasicLevel extends Level {
   fpvCamera: THREE.PerspectiveCamera;
@@ -108,7 +108,6 @@ export default class BasicLevel extends Level {
     this.createFloor();
     this.createSkybox();
     this.createPauseMenu();
-    createTU95(this.scene, this.world, new THREE.Vector3(15, 5, 5));
   }
 
   createSkybox() {
@@ -273,6 +272,9 @@ export default class BasicLevel extends Level {
         }
       });
     }
+
+    // load TU95
+    await createTU96(this, new THREE.Vector3(15, 5, 5));
   }
 
   update(deltaTime: number): void {
