@@ -21,7 +21,6 @@ All merge requests should build without ANY type errors.
 
 ## TODO
 
-- [x] real fpv cam
 - [ ] better skybox
 - [ ] proper controls
   - [ ] hover mode
@@ -34,6 +33,8 @@ All merge requests should build without ANY type errors.
 - [ ] wind (air speed)
 - [ ] HUD
 - [ ] camera delay
+- [x] real fpv cam
+- [x] fix skybox rotation
 - [x] drone model
 - [x] fpv camera
 - [x] collisions
