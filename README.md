@@ -19,32 +19,6 @@ npm dev
 
 All merge requests should build without ANY type errors.
 
-## TODO
-
-- [ ] better skybox
-- [ ] proper controls
-  - [ ] hover mode
-    - [x] take into account rotation of drone
-    - [ ] auto-level
-      - [ ] why does it work with roll but not pitch?
-    - [ ] be actually balanced
-  - [ ] HUD controls layout
-  - [ ] mode 2 controls
-- [ ] stuff in environment
-  - [ ] outdoor environment
-- [ ] temperature
-- [x] battery levels
-- [ ] wind (air speed)
-- [x] HUD
-- [ ] camera delay
-- [x] fix collider of drone
-- [x] real fpv cam
-- [x] fix skybox rotation
-- [x] drone model
-- [x] fpv camera
-- [x] collisions
-- [x] floor texture
-
 ## Initial Notes
 
 - requiremnts:
