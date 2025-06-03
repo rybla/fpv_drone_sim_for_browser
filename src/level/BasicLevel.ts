@@ -3,6 +3,7 @@ import * as THREE from "three";
 import * as config from "../config";
 import { createLowpolydrone } from "../environment/lowpolydrone";
 import { createTU96 } from "../environment/tu95";
+import { createCheckpoint, type Checkpoint } from "../environment/checkpoint";
 import Level from "./Level";
 
 export default class BasicLevel extends Level {
@@ -36,6 +37,8 @@ export default class BasicLevel extends Level {
   environmentTemperatureChangeInterval: number;
 
   motorSpeeds: number[] = [0, 0, 0, 0];
+
+  checkpoints: Checkpoint[] = [];
 
   // Settings
   settings = {
@@ -111,6 +114,10 @@ export default class BasicLevel extends Level {
     this.createLighting();
     this.createFloor();
     this.createSkybox();
+
+    // Example checkpoint
+    const cp = createCheckpoint(this, new THREE.Vector3(2, 1, -2));
+    this.checkpoints.push(cp);
   }
 
   createSkybox() {
@@ -218,6 +225,7 @@ export default class BasicLevel extends Level {
     this.updatePing(deltaTime);
     this.updateBattery(deltaTime);
     this.updatePhysics(deltaTime);
+    this.updateCheckpoints();
     this.updateGraphics(deltaTime);
     this.updateHUD(deltaTime);
   }
@@ -534,6 +542,15 @@ export default class BasicLevel extends Level {
     }
 
     this.batteryLevel = Math.max(0, this.batteryLevel - drainRate * deltaTime);
+  }
+
+  updateCheckpoints(): void {
+    for (const cp of this.checkpoints) {
+      if (!cp.done && this.world.intersectionPair(this.drone!.collider, cp.collider)) {
+        cp.done = true;
+        (cp.mesh.material as THREE.MeshStandardMaterial).color.set(0x00ff00);
+      }
+    }
   }
 
   updateHUD(_deltaTime: number) {

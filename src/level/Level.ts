@@ -13,6 +13,7 @@ export type Drone = {
   body: RAPIER.RigidBody;
   group: THREE.Group;
   propellers: THREE.Object3D[];
+  collider: RAPIER.Collider;
 };
 
 export default class Level {
