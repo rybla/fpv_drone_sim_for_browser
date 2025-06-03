@@ -2,6 +2,7 @@ import RAPIER from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
 import * as config from "../config";
 import Level from "./Level";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 export default class BasicLevel extends Level {
   fpvCamera: THREE.PerspectiveCamera;
@@ -202,42 +203,45 @@ export default class BasicLevel extends Level {
   }
 
   createDrone() {
-    // Use a darker metallic material so the lighting has nicer highlights
-    const droneMaterial = new THREE.MeshStandardMaterial({
-      color: 0x555555,
-      roughness: 0.3,
-      metalness: 0.7,
-    });
+    // // Use a darker metallic material so the lighting has nicer highlights
+    // const droneMaterial = new THREE.MeshStandardMaterial({
+    //   color: 0x555555,
+    //   roughness: 0.3,
+    //   metalness: 0.7,
+    // });
 
     const droneGroup = new THREE.Group();
     this.scene.add(droneGroup);
 
-    // chassis
-    const chassisGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.6);
-    const chassisMesh = new THREE.Mesh(chassisGeometry, droneMaterial);
-    chassisMesh.castShadow = true;
-    droneGroup.add(chassisMesh);
+    // // chassis
+    // const chassisGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.6);
+    // const chassisMesh = new THREE.Mesh(chassisGeometry, droneMaterial);
+    // chassisMesh.castShadow = true;
+    // droneGroup.add(chassisMesh);
 
-    // arms
+    // // arms
+    // const armLength = 0.8;
+    // const armThickness = 0.05;
+    // const armXGeometry = new THREE.BoxGeometry(
+    //   armLength,
+    //   armThickness,
+    //   armThickness,
+    // );
+    // const armXMesh = new THREE.Mesh(armXGeometry, droneMaterial);
+    // armXMesh.castShadow = true;
+    // droneGroup.add(armXMesh);
+
+    // const armZGeometry = new THREE.BoxGeometry(
+    //   armThickness,
+    //   armThickness,
+    //   armLength,
+    // );
+    // const armZMesh = new THREE.Mesh(armZGeometry, droneMaterial);
+    // armZMesh.castShadow = true;
+    // droneGroup.add(armZMesh);
+
     const armLength = 0.8;
     const armThickness = 0.05;
-    const armXGeometry = new THREE.BoxGeometry(
-      armLength,
-      armThickness,
-      armThickness,
-    );
-    const armXMesh = new THREE.Mesh(armXGeometry, droneMaterial);
-    armXMesh.castShadow = true;
-    droneGroup.add(armXMesh);
-
-    const armZGeometry = new THREE.BoxGeometry(
-      armThickness,
-      armThickness,
-      armLength,
-    );
-    const armZMesh = new THREE.Mesh(armZGeometry, droneMaterial);
-    armZMesh.castShadow = true;
-    droneGroup.add(armZMesh);
 
     // propellers
     const propellers: THREE.Mesh[] = [];
@@ -277,8 +281,25 @@ export default class BasicLevel extends Level {
   }
 
   async initialize(): Promise<void> {
-    console.log("[BasicLevel.initialize]");
     await super.initialize();
+    console.log("[BasicLevel.initialize]");
+
+    // load drone
+    {
+      const loader = new GLTFLoader();
+      const model = await loader.loadAsync("/models/gltf/lowpolydrone.gltf");
+      const modelClone = model.scene.clone();
+      modelClone.scale.set(0.01, 0.01, 0.01);
+      this.drone.group.add(modelClone);
+
+      // Enable shadows for all meshes in the model
+      this.drone.group.traverse((child: THREE.Object3D) => {
+        if (child instanceof THREE.Mesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+    }
   }
 
   update(deltaTime: number): void {
@@ -536,7 +557,7 @@ export default class BasicLevel extends Level {
 
     // cameras
 
-    this.fpvCamera.position.set(dronePos.x, dronePos.y, dronePos.z);
+    this.fpvCamera.position.set(dronePos.x, dronePos.y + 0.3, dronePos.z);
     this.fpvCamera.quaternion.set(
       droneRot.x,
       droneRot.y,
