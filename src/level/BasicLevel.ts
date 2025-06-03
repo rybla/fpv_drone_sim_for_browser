@@ -47,7 +47,7 @@ export default class BasicLevel extends Level {
   // Settings
   settings = {
     fov: 115,
-    windEnabled: true,
+    windEnabled: false,
     pingEnabled: true,
     temperatureMin: 50,
     temperatureMax: 90,
@@ -57,6 +57,14 @@ export default class BasicLevel extends Level {
     autoLevelStrength: 1.0,
     autoLevelEnabled: true,
     batteryDrainMultiplier: 1.0,
+  };
+
+  private readonly lateralTuning = {
+    maxAccel: 12, // horizontal accel cap  (m s⁻²)
+    brakeAccel: 30, // decel used for braking (m s⁻²)
+    earlyBrakeFactor: 1.0, // >1 ⇒ start braking sooner
+    w: 1.5, // natural freq. near hover (rad s⁻¹)
+    zeta: 4.0, // damping ratio (>1 overdamped)
   };
 
   constructor() {
@@ -265,57 +273,129 @@ export default class BasicLevel extends Level {
       const angVel = this.drone!.body.angvel();
 
       const maxTilt = THREE.MathUtils.degToRad(10);
+
       let desiredPitch =
         THREE.MathUtils.clamp(
-          -this.controls.pitch * this.settings.pitchSensitivity,
-          -1,
-          1,
-        ) * maxTilt;
-      let desiredRoll =
-        THREE.MathUtils.clamp(
-          this.controls.roll * this.settings.rollSensitivity,
+          this.controls.pitch * this.settings.pitchSensitivity,
           -1,
           1,
         ) * maxTilt;
 
-      // Lateral position hold when no manual input
+      let desiredRoll =
+        THREE.MathUtils.clamp(
+          -this.controls.roll * this.settings.rollSensitivity,
+          -1,
+          1,
+        ) * maxTilt;
+
+      // ─── Lateral position hold — early-braking predictive controller ───
       if (this.targetControls.pitch === 0 && this.targetControls.roll === 0) {
         const pos = this.drone!.body.translation();
         const vel = this.drone!.body.linvel();
+
         const errorX = this.targetPosition.x - pos.x;
         const errorZ = this.targetPosition.z - pos.z;
 
-        const holdKp = 4.0;
-        const holdKd = 3.0;
+        // Transform world errors into drone's local frame
+        const worldError = new THREE.Vector3(errorX, 0, errorZ);
+        const inverseQuat = quaternion.clone().conjugate();
+        const localError = worldError.applyQuaternion(inverseQuat);
 
-        const accX = holdKp * errorX - holdKd * vel.x;
-        const accZ = holdKp * errorZ - holdKd * vel.z;
+        // Transform world velocity into drone's local frame
+        const worldVel = new THREE.Vector3(vel.x, 0, vel.z);
+        const localVel = worldVel.applyQuaternion(inverseQuat);
 
-        desiredRoll += THREE.MathUtils.clamp(-accX / 9.81, -1, 1) * maxTilt;
-        desiredPitch += THREE.MathUtils.clamp(accZ / 9.81, -1, 1) * maxTilt;
+        const { maxAccel, brakeAccel, earlyBrakeFactor, w, zeta } =
+          this.lateralTuning;
+
+        const computeAxis = (error: numbwer, v: number): number => {
+          const speed = Math.abs(v);
+          const speedFactor = Math.min(2, speed / 5);
+          const dynamicBrake = brakeAccel * (1 + speedFactor);
+
+          const stoppingDist = (v * v) / (2 * dynamicBrake);
+          const movingToward = error * v > 0;
+
+          // Stop braking earlier to prevent overshoot
+          const earlyStopFactor = 0.3 - Math.min(0.2, speed / 20);
+          if (
+            movingToward &&
+            stoppingDist >= Math.abs(error) * earlyStopFactor
+          ) {
+            // Taper off braking force as velocity approaches zero
+            const velocityTaper = Math.min(1, speed / 2);
+            return -Math.sign(v) * dynamicBrake * velocityTaper;
+          }
+
+          // Prevent oscillation - if moving away from target at low speed, apply strong damping
+          if (!movingToward && speed < 2.0) {
+            return -Math.sign(v) * Math.min(maxAccel * 2, speed * 10);
+          }
+
+          // Normal correction with velocity-dependent damping
+          const errorFactor = Math.min(1, Math.abs(error) / 3);
+          const velocityDamping = 2 + 3 / (1 + speed); // More damping at low speeds
+          return THREE.MathUtils.clamp(
+            w * w * error * errorFactor - velocityDamping * w * v,
+            -maxAccel,
+            maxAccel,
+          );
+        };
+
+        const accX = computeAxis(localError.x, localVel.x);
+        const accZ = computeAxis(localError.z, localVel.z);
+
+        // Scale max tilt based on velocity - level off when velocity is near zero
+        const groundSpeed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
+
+        const speedFactor = Math.min(1, groundSpeed / 5);
+        const maxBrakeTilt = THREE.MathUtils.degToRad(10 + speedFactor * 25);
+
+        desiredRoll +=
+          THREE.MathUtils.clamp(-accX / 9.81, -1, 1) * maxBrakeTilt;
+        desiredPitch +=
+          THREE.MathUtils.clamp(accZ / 9.81, -1, 1) * maxBrakeTilt;
+        w;
       }
-
-      desiredPitch = THREE.MathUtils.clamp(desiredPitch, -maxTilt, maxTilt);
-      desiredRoll = THREE.MathUtils.clamp(desiredRoll, -maxTilt, maxTilt);
 
       const pitchError = desiredPitch - euler.x;
       const rollError = desiredRoll - euler.z;
 
-      const angleKp = 50.0;
-      const angleKd = 12.0;
+      // Detect extreme angles and increase gains for recovery
+      const currentTilt = Math.sqrt(euler.x * euler.x + euler.z * euler.z);
+      const extremeTiltThreshold = THREE.MathUtils.degToRad(20);
+      const gainMultiplier = currentTilt > extremeTiltThreshold ? 2.0 : 1.0;
+
+      // Apply auto-level settings
+      const autoLevelFactor = this.settings.autoLevelEnabled
+        ? this.settings.autoLevelStrength
+        : 0;
+      const effectiveDesiredPitch = desiredPitch * (1 - autoLevelFactor * 0.5);
+      const effectiveDesiredRoll = desiredRoll * (1 - autoLevelFactor * 0.5);
+
+      const effectivePitchError = effectiveDesiredPitch - euler.x;
+      const effectiveRollError = effectiveDesiredRoll - euler.z;
+
+      const angleKp = 80.0 * gainMultiplier * (1 + autoLevelFactor);
+      const angleKd = 20.0 * gainMultiplier * (1 + autoLevelFactor * 0.5);
 
       let finalPitchTorque =
         THREE.MathUtils.clamp(
-          angleKp * pitchError - angleKd * angVel.x,
+          angleKp * effectivePitchError - angleKd * angVel.x,
           -1,
           1,
         ) * config.maxPitchTorque;
       let finalRollTorque =
-        THREE.MathUtils.clamp(angleKp * rollError - angleKd * angVel.z, -1, 1) *
-        config.maxRollTorque;
+        THREE.MathUtils.clamp(
+          angleKp * effectiveRollError - angleKd * angVel.z,
+          -1,
+          1,
+        ) * config.maxRollTorque;
       let finalYawTorque =
-        this.controls.yaw * config.maxYawTorque * this.settings.yawSensitivity -
-        angVel.y * 0.05;
+        -this.controls.yaw *
+          config.maxYawTorque *
+          this.settings.yawSensitivity -
+        angVel.y * 0.01;
 
       const worldUp = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion);
 
