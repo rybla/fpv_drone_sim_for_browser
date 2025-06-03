@@ -19,6 +19,8 @@ import {
   maxThrust,
   maxYawTorque,
 } from "./config";
+import { createTank } from "./environment/tank";
+import { createBarrier } from "./environment/barrier";
 
 async function main() {
   await RAPIER.init();
@@ -244,72 +246,33 @@ async function main() {
   // military objects
   // ---------------------------------------------------------------------------
 
-  const militaryMaterial = new THREE.MeshStandardMaterial({
-    color: 0x3a3a2a,
-    roughness: 0.9,
-    metalness: 0.1,
-  });
-
-  // tank
-  const tankGroup = new THREE.Group();
-  const tankBody = new THREE.Mesh(
-    new THREE.BoxGeometry(3, 1, 6),
-    militaryMaterial,
-  );
-  tankBody.position.y = 0.5;
-  tankBody.castShadow = true;
-  tankGroup.add(tankBody);
-
-  const turret = new THREE.Mesh(
-    new THREE.BoxGeometry(1.5, 0.8, 2),
-    militaryMaterial,
-  );
-  turret.position.y = 1.2;
-  turret.castShadow = true;
-  tankGroup.add(turret);
-
-  const barrel = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.1, 0.1, 3),
-    militaryMaterial,
-  );
-  barrel.rotation.z = Math.PI / 2;
-  barrel.position.set(1.5, 1.2, 0);
-  barrel.castShadow = true;
-  tankGroup.add(barrel);
-
-  tankGroup.position.set(-8, 0, -5);
-  scene.add(tankGroup);
-  world.createCollider(
-    ColliderDesc.cuboid(1.5, 0.5, 3).setTranslation(-8, 0.5, -5),
-  );
+  createTank(scene, world, new THREE.Vector3(0, 0.5, 0));
 
   // concrete barriers
   for (let i = 0; i < 3; i++) {
-    const barrier = new THREE.Mesh(
-      new THREE.BoxGeometry(4, 2, 0.5),
-      militaryMaterial,
-    );
-    barrier.position.set(5 + i * 5, 1, 8);
-    barrier.castShadow = true;
-    barrier.receiveShadow = true;
-    scene.add(barrier);
-    world.createCollider(
-      ColliderDesc.cuboid(2, 1, 0.25).setTranslation(5 + i * 5, 1, 8),
-    );
+    createBarrier(scene, world, i);
   }
 
-  // bunker
-  const bunker = new THREE.Mesh(
-    new THREE.BoxGeometry(4, 3, 4),
-    militaryMaterial,
-  );
-  bunker.position.set(10, 1.5, -10);
-  bunker.castShadow = true;
-  bunker.receiveShadow = true;
-  scene.add(bunker);
-  world.createCollider(
-    ColliderDesc.cuboid(2, 1.5, 2).setTranslation(10, 1.5, -10),
-  );
+  {
+    const militaryMaterial = new THREE.MeshStandardMaterial({
+      color: 0x3a3a2a,
+      roughness: 0.9,
+      metalness: 0.1,
+    });
+
+    // bunker
+    const bunker = new THREE.Mesh(
+      new THREE.BoxGeometry(4, 3, 4),
+      militaryMaterial,
+    );
+    bunker.position.set(10, 1.5, -10);
+    bunker.castShadow = true;
+    bunker.receiveShadow = true;
+    scene.add(bunker);
+    world.createCollider(
+      ColliderDesc.cuboid(2, 1.5, 2).setTranslation(10, 1.5, -10),
+    );
+  }
 
   // ---------------------------------------------------------------------------
   // lighting
