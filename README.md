@@ -34,6 +34,7 @@ All merge requests should build without ANY type errors.
 - [ ] wind (air speed)
 - [ ] HUD
 - [ ] camera delay
+- [x] fix collider of drone
 - [x] real fpv cam
 - [x] fix skybox rotation
 - [x] drone model
