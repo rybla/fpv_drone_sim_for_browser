@@ -548,9 +548,9 @@ export default class Level {
 
       // Ground effect
       const droneHeight = this.drone!.body.translation().y;
-      const groundEffectHeight = 1.0; // Effect range in meters
+      const groundEffectHeight = 0.3; // Effect range in meters
       if (droneHeight < groundEffectHeight && droneHeight > 0) {
-        const effectStrength = (1 - droneHeight / groundEffectHeight) * 0.3;
+        const effectStrength = (1 - droneHeight / groundEffectHeight) * 0.4;
         const groundEffectForce = {
           x: 0,
           y: thrustMagnitude * effectStrength,
