@@ -44,6 +44,11 @@ export default class BasicLevel extends Level {
   pingChangeTimer: number;
   pingChangeInterval: number; // seconds between ping changes
 
+  temperature: number;
+  targetTemperature: number;
+  temperatureChangeTimer: number;
+  temperatureChangeInterval: number;
+
   constructor() {
     super();
     console.log("[BasicLevel.constructor]");
@@ -82,6 +87,12 @@ export default class BasicLevel extends Level {
     this.targetWindVector = new THREE.Vector3(0, 0, 0);
     this.windChangeTimer = 0;
     this.windChangeInterval = 8; // seconds between wind target changes
+
+    // temperature
+    this.temperature = 70; // Starting at 70°F
+    this.targetTemperature = 70;
+    this.temperatureChangeTimer = 0;
+    this.temperatureChangeInterval = 10; // seconds between temperature changes
 
     // ping delay
     this.pingDelay = Math.random() * 50 + 50; // 50-100ms
@@ -214,6 +225,10 @@ export default class BasicLevel extends Level {
       <div class="hud-item">
         <span class="hud-label">PING</span>
         <span class="hud-value" id="ping">0 ms</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">TEMP</span>
+        <span class="hud-value" id="temperature">70°F</span>
       </div>
     `;
     document.body.appendChild(hudContainer);
@@ -416,6 +431,7 @@ export default class BasicLevel extends Level {
       super.update(deltaTime);
       this.updateControls(deltaTime);
       this.updateWind(deltaTime);
+      this.updateTemperature(deltaTime);
       this.updatePing(deltaTime);
       this.updateBattery(deltaTime);
       this.updatePhysics(deltaTime);
@@ -647,6 +663,21 @@ export default class BasicLevel extends Level {
     this.windVector.lerp(this.targetWindVector, windSmoothing * deltaTime);
   }
 
+  updateTemperature(deltaTime: number): void {
+    this.temperatureChangeTimer += deltaTime;
+
+    if (this.temperatureChangeTimer >= this.temperatureChangeInterval) {
+      // Generate new temperature target between 50°F and 90°F
+      this.targetTemperature = 50 + Math.random() * 20;
+      this.temperatureChangeTimer = 0;
+    }
+
+    // Smoothly interpolate current temperature towards target
+    const tempSmoothing = 0.05;
+    this.temperature +=
+      (this.targetTemperature - this.temperature) * tempSmoothing * deltaTime;
+  }
+
   updatePing(deltaTime: number): void {
     this.pingChangeTimer += deltaTime;
 
@@ -714,6 +745,10 @@ export default class BasicLevel extends Level {
       `${windSpeed.toFixed(1)} m/s`;
     document.getElementById("winddir")!.textContent =
       `${normalizedWindDir.toFixed(0)}°`;
+
+    // Temperature
+    document.getElementById("temperature")!.textContent =
+      `${Math.round(this.temperature)}°F`;
   }
 
   updateGraphics(deltaTime: number): void {
