@@ -1,10 +1,13 @@
 import RAPIER from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
 import * as config from "../config";
-import { createTU96 } from "../environment/tu95";
 import { createCheckpoint, type Checkpoint } from "../environment/checkpoint";
 import { createNanodrone } from "../environment/nanodrone";
+<<<<<<< Updated upstream
 import type { Spec } from "../spec";
+=======
+import { createMansion } from "../environment/mansion";
+>>>>>>> Stashed changes
 
 export type Controls = {
   throttle: number;
@@ -345,7 +348,8 @@ export default class Level {
     this.targetPosition.set(startPos.x, 0, startPos.z);
     this.targetAltitude = startPos.y;
 
-    await createTU96(this, new THREE.Vector3(15, 5, 5));
+    //await createTU95(this, new THREE.Vector3(15, 5, 5));
+    await createMansion(this, new THREE.Vector3(1, 0.1, 1));
     this.setupSettingsMenu();
   }
 
