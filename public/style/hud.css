@@ -1,0 +1,65 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#hud {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 2;
+    color: #00ff00;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+}
+.hud-item {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    min-width: 200px;
+}
+.hud-label {
+    opacity: 0.7;
+    margin-right: 20px;
+}
+.hud-value {
+    font-weight: bold;
+    text-align: right;
+}
+.motor-thrust {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0, 255, 0, 0.3);
+}
+.motor-label {
+    opacity: 0.7;
+    margin-bottom: 8px;
+}
+.motor-bars {
+    display: flex;
+    gap: 10px;
+}
+.motor-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+.motor-bar {
+    width: 30px;
+    height: 80px;
+    background: rgba(0, 255, 0, 0.2);
+    border: 1px solid rgba(0, 255, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.1s ease;
+}
+.motor-id {
+    font-size: 12px;
+    opacity: 0.7;
+}

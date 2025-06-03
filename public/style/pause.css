@@ -1,0 +1,62 @@
+#pause-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+
+    display: none;
+}
+.pause-content {
+    text-align: center;
+    color: white;
+}
+.pause-content h1 {
+    font-family: "Courier New", monospace;
+    font-size: 48px;
+    margin-bottom: 30px;
+    color: #00ff00;
+}
+#resume-button {
+    font-family: "Courier New", monospace;
+    font-size: 24px;
+    padding: 15px 40px;
+    background: transparent;
+    border: 2px solid #00ff00;
+    color: #00ff00;
+    cursor: pointer;
+    margin-bottom: 30px;
+}
+#resume-button:hover {
+    background: rgba(0, 255, 0, 0.1);
+}
+#pause-hud {
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    color: #00ff00;
+    text-align: left;
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+}
+#pause-hud .hud-item {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    min-width: 200px;
+}
+#pause-hud .hud-label {
+    opacity: 0.7;
+    margin-right: 20px;
+}
+#pause-hud .hud-value {
+    font-weight: bold;
+    text-align: right;
+}

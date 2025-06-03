@@ -105,7 +105,6 @@ export default class BasicLevel extends Level {
     // create stuff
     this.drone = this.createDrone();
     this.createLighting();
-    this.createHUD();
     this.createFloor();
     this.createSkybox();
     this.createPauseMenu();
@@ -188,139 +187,6 @@ export default class BasicLevel extends Level {
     this.scene.add(pointLight2);
   }
 
-  createHUD() {
-    const hudContainer = document.createElement("div");
-    hudContainer.id = "hud";
-    hudContainer.innerHTML = `
-      <div class="hud-item">
-        <span class="hud-label">PITCH</span>
-        <span class="hud-value" id="pitch">0°</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">ROLL</span>
-        <span class="hud-value" id="roll">0°</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">YAW</span>
-        <span class="hud-value" id="yaw">0°</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">VELOCITY</span>
-        <span class="hud-value" id="velocity">0.0 m/s</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">GROUND SPEED</span>
-        <span class="hud-value" id="groundspeed">0.0 m/s</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">BATTERY</span>
-        <span class="hud-value" id="battery">100%</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">WIND SPEED</span>
-        <span class="hud-value" id="windspeed">0.0 m/s</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">WIND DIR</span>
-        <span class="hud-value" id="winddir">0°</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">PING</span>
-        <span class="hud-value" id="ping">0 ms</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">TEMP</span>
-        <span class="hud-value" id="temperature">70°F</span>
-      </div>
-      <div class="motor-thrust">
-        <div class="motor-label">MOTORS</div>
-        <div class="motor-bars">
-          <div class="motor-container">
-            <div class="motor-bar" id="motor0"></div>
-            <span class="motor-id">FL</span>
-          </div>
-          <div class="motor-container">
-            <div class="motor-bar" id="motor1"></div>
-            <span class="motor-id">FR</span>
-          </div>
-          <div class="motor-container">
-            <div class="motor-bar" id="motor2"></div>
-            <span class="motor-id">BL</span>
-          </div>
-          <div class="motor-container">
-            <div class="motor-bar" id="motor3"></div>
-            <span class="motor-id">BR</span>
-          </div>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(hudContainer);
-    // Add HUD styles
-    const style = document.createElement("style");
-    style.textContent = `
-      #hud {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 100;
-        color: #00ff00;
-        font-family: 'Courier New', monospace;
-        font-size: 14px;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 15px;
-        border-radius: 5px;
-        border: 1px solid rgba(0, 255, 0, 0.3);
-      }
-      .hud-item {
-        margin-bottom: 8px;
-        display: flex;
-        justify-content: space-between;
-        min-width: 200px;
-      }
-      .hud-label {
-        opacity: 0.7;
-        margin-right: 20px;
-      }
-      .hud-value {
-        font-weight: bold;
-        text-align: right;
-      }
-      .motor-thrust {
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid rgba(0, 255, 0, 0.3);
-      }
-      .motor-label {
-        opacity: 0.7;
-        margin-bottom: 8px;
-      }
-      .motor-bars {
-        display: flex;
-        gap: 10px;
-      }
-      .motor-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 5px;
-      }
-      .motor-bar {
-        width: 30px;
-        height: 80px;
-        background: rgba(0, 255, 0, 0.2);
-        border: 1px solid rgba(0, 255, 0, 0.5);
-        position: relative;
-        overflow: hidden;
-        transition: background 0.1s ease;
-      }
-      .motor-id {
-        font-size: 12px;
-        opacity: 0.7;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
   createPauseMenu() {
     const pauseContainer = document.createElement("div");
     pauseContainer.id = "pause-menu";
@@ -336,66 +202,7 @@ export default class BasicLevel extends Level {
 
     const pauseStyle = document.createElement("style");
     pauseStyle.textContent = `
-      #pause-menu {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-      }
-      .pause-content {
-        text-align: center;
-        color: white;
-      }
-      .pause-content h1 {
-        font-family: 'Courier New', monospace;
-        font-size: 48px;
-        margin-bottom: 30px;
-        color: #00ff00;
-      }
-      #resume-button {
-        font-family: 'Courier New', monospace;
-        font-size: 24px;
-        padding: 15px 40px;
-        background: transparent;
-        border: 2px solid #00ff00;
-        color: #00ff00;
-        cursor: pointer;
-        margin-bottom: 30px;
-      }
-      #resume-button:hover {
-        background: rgba(0, 255, 0, 0.1);
-      }
-      #pause-hud {
-        font-family: 'Courier New', monospace;
-        font-size: 14px;
-        color: #00ff00;
-        text-align: left;
-        display: inline-block;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 15px;
-        border-radius: 5px;
-        border: 1px solid rgba(0, 255, 0, 0.3);
-      }
-      #pause-hud .hud-item {
-        margin-bottom: 8px;
-        display: flex;
-        justify-content: space-between;
-        min-width: 200px;
-      }
-      #pause-hud .hud-label {
-        opacity: 0.7;
-        margin-right: 20px;
-      }
-      #pause-hud .hud-value {
-        font-weight: bold;
-        text-align: right;
-      }
+
     `;
     document.head.appendChild(pauseStyle);
 
@@ -407,18 +214,11 @@ export default class BasicLevel extends Level {
   togglePause() {
     this.isPaused = !this.isPaused;
     const pauseMenu = document.getElementById("pause-menu")!;
-    const normalHud = document.getElementById("hud")!;
 
     if (this.isPaused) {
       pauseMenu.style.display = "flex";
-      normalHud.style.display = "none";
-
-      // Copy HUD content to pause menu
-      const pauseHud = document.getElementById("pause-hud")!;
-      pauseHud.innerHTML = normalHud.innerHTML;
     } else {
       pauseMenu.style.display = "none";
-      normalHud.style.display = "block";
     }
   }
 
@@ -492,11 +292,6 @@ export default class BasicLevel extends Level {
       this.updatePhysics(deltaTime);
       this.updateGraphics(deltaTime);
       this.updateHUD(deltaTime);
-    } else {
-      // Update pause menu HUD
-      const pauseHud = document.getElementById("pause-hud")!;
-      const normalHud = document.getElementById("hud")!;
-      pauseHud.innerHTML = normalHud.innerHTML;
     }
 
     this.renderer.render(this.scene, this.currentCamera);

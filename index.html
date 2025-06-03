@@ -4,15 +4,79 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>fpv_drone_sim_for_browser</title>
-        <style>
-            html,
-            body {
-                margin: 0;
-                padding: 0;
-            }
-        </style>
+        <link rel="stylesheet" href="/style/hud.css" />
+        <link rel="stylesheet" href="/style/pause.css" />
     </head>
     <body>
         <script type="module" src="/src/main.ts"></script>
+        <div id="pause-menu">
+            <div class="pause-content">
+                <h1>PAUSED</h1>
+                <button id="resume-button">RESUME</button>
+            </div>
+        </div>
+        <div id="hud">
+            <div class="hud-item">
+                <span class="hud-label">PITCH</span>
+                <span class="hud-value" id="pitch">0°</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">ROLL</span>
+                <span class="hud-value" id="roll">0°</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">YAW</span>
+                <span class="hud-value" id="yaw">0°</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">VELOCITY</span>
+                <span class="hud-value" id="velocity">0.0 m/s</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">GROUND SPEED</span>
+                <span class="hud-value" id="groundspeed">0.0 m/s</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">BATTERY</span>
+                <span class="hud-value" id="battery">100%</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">WIND SPEED</span>
+                <span class="hud-value" id="windspeed">0.0 m/s</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">WIND DIR</span>
+                <span class="hud-value" id="winddir">0°</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">PING</span>
+                <span class="hud-value" id="ping">0 ms</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">TEMP</span>
+                <span class="hud-value" id="temperature">70°F</span>
+            </div>
+            <div class="motor-thrust">
+                <div class="motor-label">MOTORS</div>
+                <div class="motor-bars">
+                    <div class="motor-container">
+                        <div class="motor-bar" id="motor0"></div>
+                        <span class="motor-id">FL</span>
+                    </div>
+                    <div class="motor-container">
+                        <div class="motor-bar" id="motor1"></div>
+                        <span class="motor-id">FR</span>
+                    </div>
+                    <div class="motor-container">
+                        <div class="motor-bar" id="motor2"></div>
+                        <span class="motor-id">BL</span>
+                    </div>
+                    <div class="motor-container">
+                        <div class="motor-bar" id="motor3"></div>
+                        <span class="motor-id">BR</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
