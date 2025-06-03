@@ -238,6 +238,19 @@ export default class BasicLevel extends Level {
       };
       this.drone!.body.addForce(thrustVector, true);
 
+      // Ground effect
+      const droneHeight = this.drone!.body.translation().y;
+      const groundEffectHeight = 1.0; // Effect range in meters
+      if (droneHeight < groundEffectHeight && droneHeight > 0) {
+        const effectStrength = (1 - droneHeight / groundEffectHeight) * 0.3;
+        const groundEffectForce = {
+          x: 0,
+          y: thrustMagnitude * effectStrength,
+          z: 0,
+        };
+        this.drone!.body.addForce(groundEffectForce, true);
+      }
+
       /// Apply wind velocity
       const currentVel = this.drone!.body.linvel();
       this.drone!.body.setLinvel(
@@ -324,7 +337,7 @@ export default class BasicLevel extends Level {
         this.targetControls.throttle - throttleSpeed * deltaTime,
       );
     } else {
-      newControls.throttle = config.hoverThrottle;
+      newControls.throttle = config.hoverThrottle * 0.98;
     }
 
     // Pitch (W/S)
