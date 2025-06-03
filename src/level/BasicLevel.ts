@@ -38,6 +38,8 @@ export default class BasicLevel extends Level {
 
   motorSpeeds: number[] = [0, 0, 0, 0];
 
+  targetAltitude: number = 1;
+
   checkpoints: Checkpoint[] = [];
 
   // Settings
@@ -91,6 +93,7 @@ export default class BasicLevel extends Level {
 
     // battery
     this.batteryLevel = 100;
+    this.targetAltitude = 1;
 
     // wind
     this.windVector = new THREE.Vector3(0, 0, 0);
@@ -238,28 +241,69 @@ export default class BasicLevel extends Level {
       this.drone!.body.resetForces(true);
       this.drone!.body.resetTorques(true);
 
-      // Calculate thrust
       // Adjust for air density changes caused by temperature
       const standardTempK = 288.15; // 15°C in Kelvin
       const envTempK = ((this.environmentTemperature - 32) * (5 / 9)) + 273.15;
       const airDensityFactor = standardTempK / envTempK;
-      const thrustMagnitude =
-        (this.batteryLevel > 0 ? this.controls.throttle * config.maxThrust : 0) *
-        airDensityFactor;
-      const rotation = this.drone!.body.rotation();
 
-      // Transform local up vector to world space
-      const localUp = new THREE.Vector3(0, 1, 0);
-      const worldUp = localUp.clone();
+      const rotation = this.drone!.body.rotation();
       const quaternion = new THREE.Quaternion(
         rotation.x,
         rotation.y,
         rotation.z,
         rotation.w,
       );
-      worldUp.applyQuaternion(quaternion);
 
-      // Apply thrust
+      const euler = new THREE.Euler().setFromQuaternion(quaternion, "YXZ");
+      const angVel = this.drone!.body.angvel();
+
+      const maxTilt = THREE.MathUtils.degToRad(10);
+      const desiredPitch =
+        THREE.MathUtils.clamp(-this.controls.pitch * this.settings.pitchSensitivity, -1, 1) *
+        maxTilt;
+      const desiredRoll =
+        THREE.MathUtils.clamp(this.controls.roll * this.settings.rollSensitivity, -1, 1) *
+        maxTilt;
+
+      const pitchError = desiredPitch - euler.x;
+      const rollError = desiredRoll - euler.z;
+
+      const angleKp = 20.0;
+      const angleKd = 4.0;
+
+      let finalPitchTorque = THREE.MathUtils.clamp(
+        angleKp * pitchError - angleKd * angVel.x,
+        -1,
+        1,
+      ) * config.maxPitchTorque;
+      let finalRollTorque = THREE.MathUtils.clamp(
+        angleKp * rollError - angleKd * angVel.z,
+        -1,
+        1,
+      ) * config.maxRollTorque;
+      let finalYawTorque =
+        this.controls.yaw * config.maxYawTorque * this.settings.yawSensitivity -
+        angVel.y * 0.05;
+
+      const worldUp = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion);
+
+      const altitude = this.drone!.body.translation().y;
+      const vertVel = this.drone!.body.linvel().y;
+      const altError = this.targetAltitude - altitude;
+
+      const altKp = 15.0;
+      const altKd = 5.0;
+
+      const requiredAccel = altKp * altError - altKd * vertVel + 9.81;
+      let thrustMagnitude = 0;
+      if (this.batteryLevel > 0) {
+        thrustMagnitude = THREE.MathUtils.clamp(
+          (requiredAccel * config.droneMass) / (airDensityFactor * worldUp.y),
+          0,
+          config.maxThrust,
+        );
+      }
+
       const thrustVector = {
         x: worldUp.x * thrustMagnitude,
         y: worldUp.y * thrustMagnitude,
@@ -291,48 +335,6 @@ export default class BasicLevel extends Level {
         true,
       );
 
-      let finalPitchTorque =
-        this.controls.pitch *
-        config.maxPitchTorque *
-        this.settings.pitchSensitivity;
-      let finalRollTorque =
-        -this.controls.roll *
-        config.maxRollTorque *
-        this.settings.rollSensitivity;
-      let finalYawTorque =
-        this.controls.yaw * config.maxYawTorque * this.settings.yawSensitivity;
-
-      const noManualPitchRoll =
-        this.targetControls.pitch === 0 && this.targetControls.roll === 0;
-
-      if (noManualPitchRoll && this.settings.autoLevelEnabled) {
-        const droneRotForAutoLevel = this.drone!.body.rotation();
-        const droneQuaternionTHREE = new THREE.Quaternion(
-          droneRotForAutoLevel.x,
-          droneRotForAutoLevel.y,
-          droneRotForAutoLevel.z,
-          droneRotForAutoLevel.w,
-        );
-        const euler = new THREE.Euler().setFromQuaternion(
-          droneQuaternionTHREE,
-          "YXZ",
-        );
-
-        const currentPitch = euler.x;
-        const currentRoll = euler.z;
-
-        const correctivePitch =
-          -currentPitch *
-          config.autoLevelPitchGain *
-          this.settings.autoLevelStrength;
-        finalPitchTorque += correctivePitch;
-
-        const correctiveRoll =
-          -currentRoll *
-          config.autoLevelRollGain *
-          this.settings.autoLevelStrength;
-        finalRollTorque += correctiveRoll;
-      }
 
       const localTorque = new THREE.Vector3(
         finalPitchTorque,
@@ -461,6 +463,12 @@ export default class BasicLevel extends Level {
       (this.targetControls.yaw - this.controls.yaw) *
       controlSmoothing *
       deltaTime;
+
+    // Update target altitude based on throttle input
+    const altitudeRate = 2.0; // m/s per throttle unit
+    this.targetAltitude +=
+      (this.controls.throttle - config.hoverThrottle) * altitudeRate * deltaTime;
+    this.targetAltitude = Math.max(0.1, this.targetAltitude);
   }
 
   updateWind(deltaTime: number): void {
