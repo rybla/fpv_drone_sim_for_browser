@@ -33,7 +33,10 @@ All merge requests should build without ANY type errors.
       - this will be hard, definitely need a physics engine to handle this
 
 - stuff to simulate:
-  - [x] temperature affects battery drain
+  - [ ] temperature
+    - [x] affects battery drain
+    - [ ] affects air density, makes the drone faster or slower
+    - [ ] affects battery overheating
   - [x] battery levels
   - [x] air speed affects propellers
   - [x] propeller speed for individual propellers
