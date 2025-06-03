@@ -278,8 +278,8 @@ export default class BasicLevel extends Level {
         const errorX = this.targetPosition.x - pos.x;
         const errorZ = this.targetPosition.z - pos.z;
 
-        const holdKp = 2.0;
-        const holdKd = 1.0;
+        const holdKp = 4.0;
+        const holdKd = 3.0;
 
         const accX = holdKp * errorX - holdKd * vel.x;
         const accZ = holdKp * errorZ - holdKd * vel.z;
@@ -294,8 +294,8 @@ export default class BasicLevel extends Level {
       const pitchError = desiredPitch - euler.x;
       const rollError = desiredRoll - euler.z;
 
-      const angleKp = 40.0;
-      const angleKd = 8.0;
+      const angleKp = 50.0;
+      const angleKd = 12.0;
 
       let finalPitchTorque = THREE.MathUtils.clamp(
         angleKp * pitchError - angleKd * angVel.x,
@@ -317,8 +317,8 @@ export default class BasicLevel extends Level {
       const vertVel = this.drone!.body.linvel().y;
       const altError = this.targetAltitude - altitude;
 
-      const altKp = 30.0;
-      const altKd = 10.0;
+      const altKp = 40.0;
+      const altKd = 15.0;
 
       const requiredAccel = altKp * altError - altKd * vertVel + 9.81;
       let thrustMagnitude = 0;
