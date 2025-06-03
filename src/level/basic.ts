@@ -33,5 +33,10 @@ export function createBasicLevel(): Level {
 
   // return
 
-  return { world, scene, textureLoader };
+  return {
+    world,
+    scene,
+    textureLoader,
+    keys: {},
+  };
 }

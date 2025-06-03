@@ -79,16 +79,13 @@ async function main() {
   // Battery state
   let batteryLevel = 100; // percentage
 
-  // for each key, whether or not it's currently being held down
-  const keys: { [key: string]: boolean } = {};
-
   // Input handling
   window.addEventListener("keydown", (e) => {
-    keys[e.key.toLowerCase()] = true;
+    level.keys[e.key.toLowerCase()] = true;
   });
 
   window.addEventListener("keyup", (e) => {
-    keys[e.key.toLowerCase()] = false;
+    level.keys[e.key.toLowerCase()] = false;
   });
 
   // ---------------------------------------------------------------------------
@@ -259,12 +256,12 @@ async function main() {
     }
 
     // Throttle (up/down arrows)
-    if (keys["arrowup"]) {
+    if (level.keys["arrowup"]) {
       targetControls.throttle = Math.min(
         1,
         targetControls.throttle + throttleSpeed * deltaTime,
       );
-    } else if (keys["arrowdown"]) {
+    } else if (level.keys["arrowdown"]) {
       targetControls.throttle = Math.max(
         0,
         targetControls.throttle - throttleSpeed * deltaTime,
@@ -275,21 +272,21 @@ async function main() {
 
     // Pitch (W/S)
     targetControls.pitch = 0;
-    if (keys["w"]) targetControls.pitch = -1;
-    if (keys["s"]) targetControls.pitch = 1;
+    if (level.keys["w"]) targetControls.pitch = -1;
+    if (level.keys["s"]) targetControls.pitch = 1;
 
     // Roll (A/D)
     targetControls.roll = 0;
-    if (keys["a"]) targetControls.roll = -1;
-    if (keys["d"]) targetControls.roll = 1;
+    if (level.keys["a"]) targetControls.roll = -1;
+    if (level.keys["d"]) targetControls.roll = 1;
 
     // Yaw (Q/E)
     targetControls.yaw = 0;
-    if (keys["q"]) targetControls.yaw = -1;
-    if (keys["e"]) targetControls.yaw = 1;
+    if (level.keys["q"]) targetControls.yaw = -1;
+    if (level.keys["e"]) targetControls.yaw = 1;
 
     // Reset position
-    if (keys["r"]) {
+    if (level.keys["r"]) {
       droneBody.setTranslation({ x: 0, y: 1, z: 0 }, true);
       droneBody.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
       droneBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
@@ -298,15 +295,15 @@ async function main() {
     }
 
     // Camera switching
-    if (keys["1"]) {
+    if (level.keys["1"]) {
       console.log("Switching to FPV camera");
       currentCamera = fpvCamera;
     }
-    if (keys["2"]) {
+    if (level.keys["2"]) {
       console.log("Switching to chase camera");
       currentCamera = chaseCamera;
     }
-    if (keys["3"]) {
+    if (level.keys["3"]) {
       console.log("Switching to top camera");
       currentCamera = topCamera;
     }
