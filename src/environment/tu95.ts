@@ -31,4 +31,5 @@ export async function createTU96(level: Level, pos: THREE.Vector3) {
   const _planeCol = level.world.createCollider(
     ColliderDesc.cuboid(5, 3, 10).setTranslation(pos.x, pos.y + 3, pos.z),
   );
+  void _planeCol;
 }

@@ -442,7 +442,8 @@ export default class BasicLevel extends Level {
 
     if (this.temperatureChangeTimer >= this.temperatureChangeInterval) {
       // Generate new temperature target between 50°F and 90°F
-      this.targetTemperature = 50 + Math.random() * 20;
+      // 40 degree range
+      this.targetTemperature = 50 + Math.random() * 40;
       this.temperatureChangeTimer = 0;
     }
 
@@ -464,8 +465,14 @@ export default class BasicLevel extends Level {
 
   updateBattery(deltaTime: number): void {
     const throttleSquared = this.controls.throttle * this.controls.throttle;
-    const drainRate =
+    let drainRate =
       (100 / config.maxFlightTime) * (0.5 + throttleSquared * 1.5); // Base drain + throttle-based drain
+
+    // Increase drain in extreme temperatures
+    if (this.temperature < 60 || this.temperature > 80) {
+      drainRate *= 1.5;
+    }
+
     this.batteryLevel = Math.max(0, this.batteryLevel - drainRate * deltaTime);
   }
 
