@@ -2,65 +2,21 @@ import RAPIER, {
   ColliderDesc,
   RigidBodyDesc,
   Vector3,
-  World,
 } from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
+import type { Controls } from "./common";
+import * as config from "./config";
+import { createBarrier } from "./environment/barrier";
+import { createFloor } from "./environment/floor";
+import { createLighting } from "./environment/lighting";
+import { createTank } from "./environment/tank";
+import { createBasicLevel } from "./level/basic";
 import "./style.css";
 import { createHUD, updateHUD } from "./ui/hud";
-import type { Controls } from "./common";
-import {
-  autoLevelPitchGain,
-  autoLevelRollGain,
-  droneMass,
-  hoverThrottle,
-  maxFlightTime,
-  maxPitchTorque,
-  maxRollTorque,
-  maxThrust,
-  maxYawTorque,
-} from "./config";
-import { createTank } from "./environment/tank";
-import { createBarrier } from "./environment/barrier";
 
 async function main() {
   await RAPIER.init();
-
-  // ---------------------------------------------------------------------------
-  // world
-  // ---------------------------------------------------------------------------
-
-  const world = new World({ x: 0.0, y: -9.81, z: 0.0 });
-
-  // ---------------------------------------------------------------------------
-  // scene
-  // ---------------------------------------------------------------------------
-
-  const scene = new THREE.Scene();
-
-  // ---------------------------------------------------------------------------
-  // texture loader
-  // ---------------------------------------------------------------------------
-
-  const textureLoader = new THREE.TextureLoader();
-
-  // ---------------------------------------------------------------------------
-  // skybox
-  // ---------------------------------------------------------------------------
-
-  const cubeTextureLoader = new THREE.CubeTextureLoader();
-  const skybox = cubeTextureLoader
-    .setPath("/")
-    .load([
-      "nightsky_rt.png",
-      "nightsky_lf.png",
-      "nightsky_up.png",
-      "nightsky_dn.png",
-      "nightsky_bk.png",
-      "nightsky_ft.png",
-    ]);
-
-  scene.background = skybox; // shows in the backdrop
-  scene.environment = skybox; // lets reflective materials pick it up
+  const level = createBasicLevel();
 
   // ---------------------------------------------------------------------------
   // camera
@@ -112,7 +68,7 @@ async function main() {
 
   // Control inputs
   const controls: Controls = {
-    throttle: hoverThrottle,
+    throttle: config.hoverThrottle,
     pitch: 0,
     roll: 0,
     yaw: 0,
@@ -147,7 +103,7 @@ async function main() {
   });
 
   const droneGroup = new THREE.Group();
-  scene.add(droneGroup);
+  level.scene.add(droneGroup);
 
   // chassis
   const chassisGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.6);
@@ -195,7 +151,7 @@ async function main() {
   }
 
   const droneMesh = droneGroup;
-  const droneBody = world.createRigidBody(
+  const droneBody = level.world.createRigidBody(
     RigidBodyDesc.dynamic()
       .setTranslation(0.0, 1.0, -2.0)
       .setLinvel(0.0, 0.0, 0.0)
@@ -203,54 +159,25 @@ async function main() {
       .setCcdEnabled(true),
   );
 
-  const droneCol = world.createCollider(
+  const droneCol = level.world.createCollider(
     ColliderDesc.cuboid(0.52, 0.075, 0.52)
-      .setMass(droneMass)
+      .setMass(config.droneMass)
       .setRestitution(0.2)
       .setFriction(0.5),
     droneBody,
   );
 
-  // ---------------------------------------------------------------------------
-  // floor
-  // ---------------------------------------------------------------------------
-
-  const floorSize = 10000;
-  const floorTexture = textureLoader.load("/floor.png");
-  floorTexture.wrapS = THREE.RepeatWrapping;
-  floorTexture.wrapT = THREE.RepeatWrapping;
-  const textureRepeats = floorSize / 20;
-  floorTexture.repeat.set(textureRepeats, textureRepeats);
-
-  const floorMaterial = new THREE.MeshStandardMaterial({
-    color: 0x808080,
-    roughness: 0.8,
-    metalness: 0.2,
-    map: floorTexture,
-  });
-  const floorGeometry = new THREE.BoxGeometry(floorSize, 0.2, floorSize);
-  floorGeometry.computeVertexNormals();
-  const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-  floor.position.y = -0.1;
-  floor.receiveShadow = true;
-  scene.add(floor);
-  world.createCollider(
-    RAPIER.ColliderDesc.cuboid(
-      floorSize / 2,
-      0.1,
-      floorSize / 2,
-    ).setTranslation(0, -0.1, 0),
-  );
+  createFloor(level);
 
   // ---------------------------------------------------------------------------
   // military objects
   // ---------------------------------------------------------------------------
 
-  createTank(scene, world, new THREE.Vector3(0, 0.5, 0));
+  createTank(level.scene, level.world, new THREE.Vector3(0, 0.5, 0));
 
   // concrete barriers
   for (let i = 0; i < 3; i++) {
-    createBarrier(scene, world, i);
+    createBarrier(level.scene, level.world, i);
   }
 
   {
@@ -268,43 +195,13 @@ async function main() {
     bunker.position.set(10, 1.5, -10);
     bunker.castShadow = true;
     bunker.receiveShadow = true;
-    scene.add(bunker);
-    world.createCollider(
+    level.scene.add(bunker);
+    level.world.createCollider(
       ColliderDesc.cuboid(2, 1.5, 2).setTranslation(10, 1.5, -10),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // lighting
-  // ---------------------------------------------------------------------------
-
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-  scene.add(ambientLight);
-
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
-  scene.add(hemiLight);
-
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-  directionalLight.position.set(5, 10, 5);
-  directionalLight.castShadow = true;
-  directionalLight.shadow.mapSize.width = 1024;
-  directionalLight.shadow.mapSize.height = 1024;
-  directionalLight.shadow.camera.near = 0.1;
-  directionalLight.shadow.camera.far = 50;
-  directionalLight.shadow.camera.left = -20;
-  directionalLight.shadow.camera.right = 20;
-  directionalLight.shadow.camera.top = 20;
-  directionalLight.shadow.camera.bottom = -20;
-  scene.add(directionalLight);
-
-  // Additional point lights to softly illuminate the scene
-  const pointLight1 = new THREE.PointLight(0xffffff, 0.6);
-  pointLight1.position.set(5, 3, 5);
-  scene.add(pointLight1);
-
-  const pointLight2 = new THREE.PointLight(0xffffff, 0.6);
-  pointLight2.position.set(-5, 3, -5);
-  scene.add(pointLight2);
+  createLighting(level.scene);
 
   // ---------------------------------------------------------------------------
   // time
@@ -312,7 +209,7 @@ async function main() {
 
   const clock = new THREE.Clock();
   let accumulator = 0;
-  world.timestep = 1 / 60;
+  level.world.timestep = 1 / 60;
   const fixedTimeStep = 1 / 60;
 
   function update() {
@@ -348,7 +245,7 @@ async function main() {
     const alignmentFactor = droneWorldUp.y;
 
     const calculatedBaseHoverThrottle =
-      (droneMass * Math.abs(world.gravity.y)) / maxThrust;
+      (config.droneMass * Math.abs(level.world.gravity.y)) / config.maxThrust;
 
     if (alignmentFactor <= 0) {
       dynamicHoverThrottleToUse = 0.0;
@@ -373,7 +270,7 @@ async function main() {
         targetControls.throttle - throttleSpeed * deltaTime,
       );
     } else {
-      targetControls.throttle = hoverThrottle;
+      targetControls.throttle = config.hoverThrottle;
     }
 
     // Pitch (W/S)
@@ -433,7 +330,8 @@ async function main() {
 
     // Update battery
     const throttleSquared = controls.throttle * controls.throttle;
-    const drainRate = (100 / maxFlightTime) * (0.5 + throttleSquared * 1.5); // Base drain + throttle-based drain
+    const drainRate =
+      (100 / config.maxFlightTime) * (0.5 + throttleSquared * 1.5); // Base drain + throttle-based drain
     batteryLevel = Math.max(0, batteryLevel - drainRate * deltaTime);
 
     // ---------------------------------------------------------------------------
@@ -446,7 +344,7 @@ async function main() {
       droneBody.resetTorques(true);
 
       // Calculate thrust
-      const thrustMagnitude = controls.throttle * maxThrust;
+      const thrustMagnitude = controls.throttle * config.maxThrust;
       const rotation = droneBody.rotation();
 
       // Transform local up vector to world space
@@ -468,9 +366,9 @@ async function main() {
       };
       droneBody.addForce(thrustVector, true);
 
-      let finalPitchTorque = controls.pitch * maxPitchTorque;
-      let finalRollTorque = -controls.roll * maxRollTorque;
-      let finalYawTorque = controls.yaw * maxYawTorque;
+      let finalPitchTorque = controls.pitch * config.maxPitchTorque;
+      let finalRollTorque = -controls.roll * config.maxRollTorque;
+      let finalYawTorque = controls.yaw * config.maxYawTorque;
 
       const noManualPitchRoll =
         targetControls.pitch === 0 && targetControls.roll === 0;
@@ -491,10 +389,10 @@ async function main() {
         const currentPitch = euler.x;
         const currentRoll = euler.z;
 
-        const correctivePitch = currentPitch * autoLevelPitchGain;
+        const correctivePitch = currentPitch * config.autoLevelPitchGain;
         finalPitchTorque += correctivePitch;
 
-        const correctiveRoll = -currentRoll * autoLevelRollGain;
+        const correctiveRoll = -currentRoll * config.autoLevelRollGain;
         finalRollTorque += correctiveRoll;
       }
 
@@ -514,7 +412,7 @@ async function main() {
         true,
       );
 
-      world.step();
+      level.world.step();
 
       accumulator -= fixedTimeStep;
     }
@@ -556,7 +454,7 @@ async function main() {
     // render scene
     // ---------------------------------------------------------------------------
 
-    renderer.render(scene, currentCamera);
+    renderer.render(level.scene, currentCamera);
   }
 
   update();
