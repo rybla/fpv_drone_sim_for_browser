@@ -707,13 +707,25 @@ export default class BasicLevel extends Level {
       const yawGain = 15;
 
       this.propellers.forEach((prop, i) => {
-        const frontDir = prop.position.z < 0 ? -1 : 1; // -1 front, +1 back
-        const rightDir = prop.position.x > 0 ? 1 : -1; // +1 right, -1 left
+        // Get propeller position in drone's local space
+        const worldPos = new THREE.Vector3();
+        prop.getWorldPosition(worldPos);
+        const droneWorldPos = new THREE.Vector3();
+        this.drone.group.getWorldPosition(droneWorldPos);
+        const droneWorldQuat = new THREE.Quaternion();
+        this.drone.group.getWorldQuaternion(droneWorldQuat);
+
+        // Transform to drone's local space
+        const localPos = worldPos.sub(droneWorldPos);
+        localPos.applyQuaternion(droneWorldQuat.conjugate());
+
+        const frontDir = localPos.z < 0 ? -1 : 1; // -1 front, +1 back
+        const rightDir = localPos.x > 0 ? 1 : -1; // +1 right, -1 left
         const yawDir = (i & 1) === 0 ? 1 : -1; // CW / CCW rotor pair
 
         const speed =
           base +
-          this.controls.pitch * pitchGain * frontDir + // pitch: front vs back
+          this.controls.pitch * pitchGain * -frontDir + // pitch: front vs back
           this.controls.roll * rollGain * -rightDir + // roll: left vs right (inverted)
           this.controls.yaw * yawGain * yawDir; // yaw: CW vs CCW
 
