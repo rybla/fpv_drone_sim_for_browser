@@ -32,9 +32,9 @@ All merge requests should build without ANY type errors.
 - [ ] stuff in environment
   - [ ] outdoor environment
 - [ ] temperature
-- [ ] battery levels
+- [x] battery levels
 - [ ] wind (air speed)
-- [ ] HUD
+- [x] HUD
 - [ ] camera delay
 - [x] fix collider of drone
 - [x] real fpv cam
