@@ -44,6 +44,9 @@ All merge requests should build without ANY type errors.
   - [x] camera delay
       - VETO: just ping
 
+## Environment Specification
+
+- basic environment (3D model of environment and its landmarks)
 - one/two-way mission
 - high/low light
 - start point
