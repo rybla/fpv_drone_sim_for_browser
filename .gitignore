@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # Big files
-/models/gltf/textures
+public/models/gltf/textures
