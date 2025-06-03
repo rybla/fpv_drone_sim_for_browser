@@ -33,13 +33,10 @@ All merge requests should build without ANY type errors.
       - this will be hard, definitely need a physics engine to handle this
 
 - stuff to simulate:
-  - temperature
-  - battery levels
-  - air speed
-  - propeller speed
-  - controls
-    - mode 2
-    - layout
-    - how affects specific motors
-  - first-person view from front of drone
-  - camera delay
+  - [x] temperature affects battery drain
+  - [x] battery levels
+  - [x] air speed affects propellers
+  - [x] propeller speed for individual propellers
+  - [ ] controls: mode 2 layout
+  - [x] first-person view from front of drone
+  - [ ] camera delay
