@@ -57,6 +57,7 @@ export default class BasicLevel extends Level {
     autoLevelStrength: 1.0,
     autoLevelEnabled: true,
     batteryDrainMultiplier: 1.0,
+    infiniteBattery: false,
   };
 
   private readonly lateralTuning = {
@@ -658,6 +659,11 @@ export default class BasicLevel extends Level {
   }
 
   updateBattery(deltaTime: number): void {
+    if (this.settings.infiniteBattery) {
+      this.batteryLevel = 100;
+      return;
+    }
+
     const throttleSquared = this.controls.throttle * this.controls.throttle;
     let drainRate =
       (100 / config.maxFlightTime) *
@@ -893,6 +899,14 @@ export default class BasicLevel extends Level {
       this.settings.batteryDrainMultiplier = parseFloat(batteryDrain.value);
     });
 
+    // Infinite Battery
+    const infiniteBatteryToggle = document.getElementById(
+      "infinite-battery-toggle",
+    ) as HTMLInputElement;
+    infiniteBatteryToggle?.addEventListener("change", () => {
+      this.settings.infiniteBattery = infiniteBatteryToggle.checked;
+    });
+
     // Reset to defaults
     const resetButton = document.getElementById("reset-defaults");
     resetButton?.addEventListener("click", () => {
@@ -909,6 +923,7 @@ export default class BasicLevel extends Level {
         autoLevelStrength: 1.0,
         autoLevelEnabled: true,
         batteryDrainMultiplier: 1.0,
+        infiniteBattery: false,
       };
 
       // Update all UI elements
@@ -935,6 +950,9 @@ export default class BasicLevel extends Level {
       (document.getElementById("battery-drain") as HTMLInputElement).value =
         "1.0";
       document.getElementById("battery-drain-value")!.textContent = "1.0x";
+      (
+        document.getElementById("infinite-battery-toggle") as HTMLInputElement
+      ).checked = false;
 
       // Apply settings
       this.applySettings(this.settings);
