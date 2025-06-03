@@ -11,6 +11,7 @@ export default class BasicLevel extends Level {
   fpvCamera: THREE.PerspectiveCamera;
   chaseCamera: THREE.PerspectiveCamera;
   topCamera: THREE.PerspectiveCamera;
+  private propellers: THREE.Object3D[] = [];
   /**
    * the currently active camera that is being rendered from
    */
@@ -264,6 +265,14 @@ export default class BasicLevel extends Level {
         if (child instanceof THREE.Mesh) {
           child.castShadow = true;
           child.receiveShadow = true;
+        }
+      });
+
+      // ─── Store references to the 4 wing meshes so we can spin them ───
+      modelClone.traverse((child: THREE.Object3D) => {
+        // Wing nodes are named "Wing1", "Wing2", … in this GLTF
+        if (child.name.startsWith("Wing")) {
+          this.propellers.push(child);
         }
       });
     }
@@ -565,6 +574,12 @@ export default class BasicLevel extends Level {
       droneRot.z,
       droneRot.w,
     );
+
+    // ─── Spin propellers in proportion to throttle ───
+    const spinSpeed = this.controls.throttle * 20; // rad / s at full throttle
+    this.propellers.forEach((p) => {
+      p.rotation.z += spinSpeed * deltaTime; // rotate about local Y
+    });
 
     // cameras
 
