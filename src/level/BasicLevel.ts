@@ -31,6 +31,19 @@ export default class BasicLevel extends Level {
     group: THREE.Group;
   };
 
+  pingDelay: number; // milliseconds
+  inputBuffer: Array<{
+    timestamp: number;
+    controls: {
+      throttle: number;
+      pitch: number;
+      roll: number;
+      yaw: number;
+    };
+  }>;
+  pingChangeTimer: number;
+  pingChangeInterval: number; // seconds between ping changes
+
   constructor() {
     super();
     console.log("[BasicLevel.constructor]");
@@ -69,6 +82,12 @@ export default class BasicLevel extends Level {
     this.targetWindVector = new THREE.Vector3(0, 0, 0);
     this.windChangeTimer = 0;
     this.windChangeInterval = 8; // seconds between wind target changes
+
+    // ping delay
+    this.pingDelay = Math.random() * 50 + 50; // 50-100ms
+    this.inputBuffer = [];
+    this.pingChangeTimer = 0;
+    this.pingChangeInterval = 3; // change ping every 3 seconds
 
     // create stuff
     this.drone = this.createDrone();
@@ -191,6 +210,10 @@ export default class BasicLevel extends Level {
       <div class="hud-item">
         <span class="hud-label">WIND DIR</span>
         <span class="hud-value" id="winddir">0°</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">PING</span>
+        <span class="hud-value" id="ping">0 ms</span>
       </div>
     `;
     document.body.appendChild(hudContainer);
@@ -393,6 +416,7 @@ export default class BasicLevel extends Level {
       super.update(deltaTime);
       this.updateControls(deltaTime);
       this.updateWind(deltaTime);
+      this.updatePing(deltaTime);
       this.updateBattery(deltaTime);
       this.updatePhysics(deltaTime);
       this.updateGraphics(deltaTime);
@@ -501,68 +525,59 @@ export default class BasicLevel extends Level {
 
   updateControls(deltaTime: number) {
     const throttleSpeed = 1.0;
+    const currentTime = performance.now();
 
-    // hover throttle that takes into account drone rotation
-    let dynamicHoverThrottleToUse: number;
-
-    const currentDroneRotation = this.drone.body.rotation();
-    const droneQuaternionForHover = new THREE.Quaternion(
-      currentDroneRotation.x,
-      currentDroneRotation.y,
-      currentDroneRotation.z,
-      currentDroneRotation.w,
-    );
-    const droneLocalUp = new THREE.Vector3(0, 1, 0);
-    const droneWorldUp = droneLocalUp
-      .clone()
-      .applyQuaternion(droneQuaternionForHover);
-    const alignmentFactor = droneWorldUp.y;
-
-    const calculatedBaseHoverThrottle =
-      (config.droneMass * Math.abs(this.world.gravity.y)) / config.maxThrust;
-
-    if (alignmentFactor <= 0) {
-      dynamicHoverThrottleToUse = 0.0;
-    } else {
-      dynamicHoverThrottleToUse =
-        calculatedBaseHoverThrottle / Math.max(alignmentFactor, 0.1);
-      dynamicHoverThrottleToUse = Math.min(
-        1.0,
-        Math.max(0.0, dynamicHoverThrottleToUse),
-      );
-    }
+    // Create new control input based on current keys
+    const newControls = {
+      throttle: this.targetControls.throttle,
+      pitch: 0,
+      roll: 0,
+      yaw: 0,
+    };
 
     // Throttle (up/down arrows)
     if (this.keys["arrowup"]) {
-      this.targetControls.throttle = Math.min(
+      newControls.throttle = Math.min(
         1,
         this.targetControls.throttle + throttleSpeed * deltaTime,
       );
     } else if (this.keys["arrowdown"]) {
-      this.targetControls.throttle = Math.max(
+      newControls.throttle = Math.max(
         0,
         this.targetControls.throttle - throttleSpeed * deltaTime,
       );
     } else {
-      this.targetControls.throttle = config.hoverThrottle;
+      newControls.throttle = config.hoverThrottle;
     }
 
     // Pitch (W/S)
-    this.targetControls.pitch = 0;
-    if (this.keys["w"]) this.targetControls.pitch = -1;
-    if (this.keys["s"]) this.targetControls.pitch = 1;
+    if (this.keys["w"]) newControls.pitch = -1;
+    if (this.keys["s"]) newControls.pitch = 1;
 
     // Roll (A/D)
-    this.targetControls.roll = 0;
-    if (this.keys["a"]) this.targetControls.roll = -1;
-    if (this.keys["d"]) this.targetControls.roll = 1;
+    if (this.keys["a"]) newControls.roll = -1;
+    if (this.keys["d"]) newControls.roll = 1;
 
     // Yaw (Q/E)
-    this.targetControls.yaw = 0;
-    if (this.keys["q"]) this.targetControls.yaw = -1;
-    if (this.keys["e"]) this.targetControls.yaw = 1;
+    if (this.keys["q"]) newControls.yaw = -1;
+    if (this.keys["e"]) newControls.yaw = 1;
 
-    // Reset position
+    // Add to input buffer with timestamp
+    this.inputBuffer.push({
+      timestamp: currentTime,
+      controls: { ...newControls },
+    });
+
+    // Process delayed inputs
+    while (
+      this.inputBuffer.length > 0 &&
+      currentTime - this.inputBuffer[0].timestamp >= this.pingDelay
+    ) {
+      const delayedInput = this.inputBuffer.shift()!;
+      this.targetControls = delayedInput.controls;
+    }
+
+    // Reset position (immediate, no delay)
     if (this.keys["r"]) {
       this.drone.body.setTranslation({ x: 0, y: 1, z: 0 }, true);
       this.drone.body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
@@ -571,12 +586,12 @@ export default class BasicLevel extends Level {
       this.batteryLevel = 100;
     }
 
-    // Super battery drain
+    // Super battery drain (immediate)
     if (this.keys["b"]) {
       this.batteryLevel = 2;
     }
 
-    // Camera switching
+    // Camera switching (immediate)
     if (this.keys["1"]) {
       console.log("Switching to FPV camera");
       this.currentCamera = this.fpvCamera;
@@ -632,6 +647,16 @@ export default class BasicLevel extends Level {
     this.windVector.lerp(this.targetWindVector, windSmoothing * deltaTime);
   }
 
+  updatePing(deltaTime: number): void {
+    this.pingChangeTimer += deltaTime;
+
+    if (this.pingChangeTimer >= this.pingChangeInterval) {
+      // Generate new ping value between 50-100ms
+      this.pingDelay = Math.random() * 50 + 50;
+      this.pingChangeTimer = 0;
+    }
+  }
+
   updateBattery(deltaTime: number): void {
     const throttleSquared = this.controls.throttle * this.controls.throttle;
     const drainRate =
@@ -680,6 +705,10 @@ export default class BasicLevel extends Level {
       (Math.atan2(this.windVector.z, this.windVector.x) * 180) / Math.PI;
     const normalizedWindDir =
       windDirection < 0 ? windDirection + 360 : windDirection;
+
+    // Ping
+    document.getElementById("ping")!.textContent =
+      `${Math.round(this.pingDelay)} ms`;
 
     document.getElementById("windspeed")!.textContent =
       `${windSpeed.toFixed(1)} m/s`;
