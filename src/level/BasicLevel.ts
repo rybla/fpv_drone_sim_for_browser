@@ -44,7 +44,11 @@ export default class BasicLevel extends Level {
     // cameras
 
     this.fpvCamera = new THREE.PerspectiveCamera(
-      100,
+      // 120,
+      115,
+      // 100,
+      // 90,
+      // 75,
       window.innerWidth / window.innerHeight,
       0.01,
       100,
@@ -97,38 +101,27 @@ export default class BasicLevel extends Level {
   createSkybox() {
     const cubeTextureLoader = new THREE.CubeTextureLoader();
 
+    // const skybox = cubeTextureLoader
+    //   .setPath("/")
+    //   .load([
+    //     "nightsky_rt.png",
+    //     "nightsky_lf.png",
+    //     "nightsky_up.png",
+    //     "nightsky_dn.png",
+    //     "nightsky_bk.png",
+    //     "nightsky_ft.png",
+    //   ]);
+
     const skybox = cubeTextureLoader
       .setPath("/")
       .load([
-        "nightsky_rt.png",
-        "nightsky_lf.png",
-        "nightsky_up.png",
-        "nightsky_dn.png",
-        "nightsky_bk.png",
-        "nightsky_ft.png",
+        "xpos.png",
+        "xneg.png",
+        "ypos.png",
+        "yneg.png",
+        "zpos.png",
+        "zneg.png",
       ]);
-
-    // const skybox = cubeTextureLoader
-    //   .setPath("/")
-    //   .load([
-    //     "DaylightSkybox_Right.bmp",
-    //     "DaylightSkybox_Left.bmp",
-    //     "DaylightSkybox_Top.bmp",
-    //     "DaylightSkybox_Down.bmp",
-    //     "DaylightSkybox_Back.bmp",
-    //     "DaylightSkybox_Front.bmp",
-    //   ]);
-
-    // const skybox = cubeTextureLoader
-    //   .setPath("/")
-    //   .load([
-    //     "DaylightSkybox_Right.bmp",
-    //     "DaylightSkybox_Left.bmp",
-    //     "DaylightSkybox_Top.bmp",
-    //     "DaylightSkybox_Down.bmp",
-    //     "DaylightSkybox_Back.bmp",
-    //     "DaylightSkybox_Front.bmp",
-    //   ]);
 
     this.scene.background = skybox; // shows in the backdrop
     this.scene.environment = skybox; // lets reflective materials pick it up
