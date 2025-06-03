@@ -481,16 +481,11 @@ export default class BasicLevel extends Level {
     this.temperatureChangeTimer += deltaTime;
 
     if (this.temperatureChangeTimer >= this.temperatureChangeInterval) {
-<<<<<<< Updated upstream
       // Generate new temperature target between 50°F and 90°F
       // 40 degree range
-      this.targetTemperature = 50 + Math.random() * 40;
-=======
-      // Generate new temperature target between min and max
       const range = this.settings.temperatureMax - this.settings.temperatureMin;
-      this.targetTemperature =
-        this.settings.temperatureMin + Math.random() * range;
->>>>>>> Stashed changes
+      this.targetTemperature = 50 + Math.random() * 40 * range;
+
       this.temperatureChangeTimer = 0;
     }
 
@@ -517,21 +512,16 @@ export default class BasicLevel extends Level {
 
   updateBattery(deltaTime: number): void {
     const throttleSquared = this.controls.throttle * this.controls.throttle;
-<<<<<<< Updated upstream
     let drainRate =
-      (100 / config.maxFlightTime) * (0.5 + throttleSquared * 1.5); // Base drain + throttle-based drain
+      (100 / config.maxFlightTime) *
+      (0.5 + throttleSquared * 1.5) *
+      this.settings.batteryDrainMultiplier;
 
     // Increase drain in extreme temperatures
     if (this.temperature < 60 || this.temperature > 80) {
       drainRate *= 1.5;
     }
 
-=======
-    const drainRate =
-      (100 / config.maxFlightTime) *
-      (0.5 + throttleSquared * 1.5) *
-      this.settings.batteryDrainMultiplier;
->>>>>>> Stashed changes
     this.batteryLevel = Math.max(0, this.batteryLevel - drainRate * deltaTime);
   }
 
