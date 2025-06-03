@@ -30,10 +30,10 @@ export default class BasicLevel extends Level {
   pingChangeTimer: number;
   pingChangeInterval: number; // seconds between ping changes
 
-  temperature: number;
-  targetTemperature: number;
-  temperatureChangeTimer: number;
-  temperatureChangeInterval: number;
+  environmentTemperature: number;
+  targetEnvironmentTemperature: number;
+  environmentTemperatureChangeTimer: number;
+  environmentTemperatureChangeInterval: number;
 
   motorSpeeds: number[] = [0, 0, 0, 0];
 
@@ -96,10 +96,10 @@ export default class BasicLevel extends Level {
     this.windChangeInterval = 8; // seconds between wind target changes
 
     // temperature
-    this.temperature = 70; // Starting at 70°F
-    this.targetTemperature = 70;
-    this.temperatureChangeTimer = 0;
-    this.temperatureChangeInterval = 10; // seconds between temperature changes
+    this.environmentTemperature = 70; // Starting at 70°F
+    this.targetEnvironmentTemperature = 70;
+    this.environmentTemperatureChangeTimer = 0;
+    this.environmentTemperatureChangeInterval = 10; // seconds between temperature changes
 
     // ping delay
     this.pingDelay = Math.random() * 50 + 50; // 50-100ms
@@ -478,21 +478,26 @@ export default class BasicLevel extends Level {
   }
 
   updateTemperature(deltaTime: number): void {
-    this.temperatureChangeTimer += deltaTime;
+    this.environmentTemperatureChangeTimer += deltaTime;
 
-    if (this.temperatureChangeTimer >= this.temperatureChangeInterval) {
+    if (
+      this.environmentTemperatureChangeTimer >=
+      this.environmentTemperatureChangeInterval
+    ) {
       // Generate new temperature target between 50°F and 90°F
       // 40 degree range
       const range = this.settings.temperatureMax - this.settings.temperatureMin;
-      this.targetTemperature = 50 + Math.random() * 40 * range;
+      this.targetEnvironmentTemperature = 50 + Math.random() * 40 * range;
 
-      this.temperatureChangeTimer = 0;
+      this.environmentTemperatureChangeTimer = 0;
     }
 
     // Smoothly interpolate current temperature towards target
     const tempSmoothing = 0.05;
-    this.temperature +=
-      (this.targetTemperature - this.temperature) * tempSmoothing * deltaTime;
+    this.environmentTemperature +=
+      (this.targetEnvironmentTemperature - this.environmentTemperature) *
+      tempSmoothing *
+      deltaTime;
   }
 
   updatePing(deltaTime: number): void {
@@ -518,7 +523,7 @@ export default class BasicLevel extends Level {
       this.settings.batteryDrainMultiplier;
 
     // Increase drain in extreme temperatures
-    if (this.temperature < 60 || this.temperature > 80) {
+    if (this.environmentTemperature < 60 || this.environmentTemperature > 80) {
       drainRate *= 1.5;
     }
 
@@ -578,7 +583,7 @@ export default class BasicLevel extends Level {
 
     // Temperature
     document.getElementById("temperature")!.textContent =
-      `${Math.round(this.temperature)}°F`;
+      `${Math.round(this.environmentTemperature)}°F`;
 
     // Update motor thrust bars
     // Calculate motor speeds based on control inputs (same mixing as propellers)
