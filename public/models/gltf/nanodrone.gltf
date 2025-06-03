@@ -1,0 +1,180 @@
+{
+    "asset": {
+        "version": "2.0",
+        "generator": "Open Asset Import Library (assimp v5.2.cf7d3637)"
+    },
+    "extensionsUsed": [
+        "KHR_materials_volume",
+        "KHR_materials_ior",
+        "FB_ngon_encoding"
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 174066,
+            "type": "VEC3",
+            "max": [
+                38.212501525878909,
+                6.0,
+                46.25619888305664
+            ],
+            "min": [
+                -38.212501525878909,
+                -23.600000381469728,
+                -46.25419998168945
+            ]
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 174066,
+            "type": "VEC3",
+            "max": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -1.0,
+                -1.0
+            ]
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 174066,
+            "type": "VEC2",
+            "max": [
+                0.6214579939842224,
+                0.9998104572296143
+            ],
+            "min": [
+                0.0001289450010517612,
+                0.37577199935913088
+            ]
+        },
+        {
+            "bufferView": 3,
+            "byteOffset": 0,
+            "componentType": 5125,
+            "count": 174066,
+            "type": "SCALAR",
+            "max": [
+                174065
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 6266376,
+            "uri": "nanodrone.bin"
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 2088792,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 2088792,
+            "byteLength": 2088792,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 4177584,
+            "byteLength": 1392528,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 5570112,
+            "byteLength": 696264,
+            "target": 34963
+        }
+    ],
+    "materials": [
+        {
+            "name": "DefaultMaterial",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.6000000238418579,
+                    0.6000000238418579,
+                    0.6000000238418579,
+                    1.0
+                ],
+                "metallicFactor": 0.0
+            },
+            "extensions": {
+                "KHR_materials_ior": {
+                    "ior": 1.0
+                }
+            }
+        },
+        {
+            "name": "Hard_Rough_Plastic_Black_#1",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.6000000238418579,
+                    0.6000000238418579,
+                    0.6000000238418579,
+                    1.0
+                ],
+                "metallicFactor": 0.0
+            },
+            "extensions": {
+                "KHR_materials_ior": {
+                    "ior": 1.0
+                }
+            }
+        }
+    ],
+    "meshes": [
+        {
+            "name": "TES107_NANO FPV_R3.0_MASTER",
+            "primitives": [
+                {
+                    "mode": 4,
+                    "material": 1,
+                    "indices": 3,
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
+                    }
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "name": "TES107_SOLID_060225.obj",
+            "children": [
+                1
+            ]
+        },
+        {
+            "name": "TES107_NANO FPV_R3.0_MASTER",
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [
+                0
+            ]
+        }
+    ],
+    "scene": 0
+}
