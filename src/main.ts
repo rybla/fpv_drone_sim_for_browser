@@ -181,6 +181,9 @@ async function main() {
   const maxRollTorque = 0.015;
   const maxYawTorque = 0.008;
 
+  const autoLevelPitchGain = 0.03;
+  const autoLevelRollGain = 0.03;
+
   // Input handling
   window.addEventListener("keydown", (e) => {
     keys[e.key.toLowerCase()] = true;
@@ -429,14 +432,16 @@ async function main() {
     let dynamicHoverThrottleToUse: number;
 
     const currentDroneRotation = droneBody.rotation();
-    const droneQuaternion = new THREE.Quaternion(
+    const droneQuaternionForHover = new THREE.Quaternion(
       currentDroneRotation.x,
       currentDroneRotation.y,
       currentDroneRotation.z,
       currentDroneRotation.w,
     );
     const droneLocalUp = new THREE.Vector3(0, 1, 0);
-    const droneWorldUp = droneLocalUp.clone().applyQuaternion(droneQuaternion);
+    const droneWorldUp = droneLocalUp
+      .clone()
+      .applyQuaternion(droneQuaternionForHover);
     const alignmentFactor = droneWorldUp.y;
 
     const calculatedBaseHoverThrottle =
@@ -551,13 +556,41 @@ async function main() {
       };
       droneBody.addForce(thrustVector, true);
 
-      // Calculate torques in local space
-      const pitchTorque = controls.pitch * maxPitchTorque;
-      const rollTorque = -controls.roll * maxRollTorque;
-      const yawTorque = controls.yaw * maxYawTorque;
+      let finalPitchTorque = controls.pitch * maxPitchTorque;
+      let finalRollTorque = -controls.roll * maxRollTorque;
+      let finalYawTorque = controls.yaw * maxYawTorque;
 
-      // Convert to world space
-      const localTorque = new THREE.Vector3(pitchTorque, yawTorque, rollTorque);
+      const noManualPitchRoll =
+        targetControls.pitch === 0 && targetControls.roll === 0;
+
+      if (noManualPitchRoll) {
+        const droneRotForAutoLevel = droneBody.rotation();
+        const droneQuaternionTHREE = new THREE.Quaternion(
+          droneRotForAutoLevel.x,
+          droneRotForAutoLevel.y,
+          droneRotForAutoLevel.z,
+          droneRotForAutoLevel.w,
+        );
+        const euler = new THREE.Euler().setFromQuaternion(
+          droneQuaternionTHREE,
+          "YXZ",
+        );
+
+        const currentPitch = euler.x;
+        const currentRoll = euler.z;
+
+        const correctivePitch = currentPitch * autoLevelPitchGain;
+        finalPitchTorque += correctivePitch;
+
+        const correctiveRoll = -currentRoll * autoLevelRollGain;
+        finalRollTorque += correctiveRoll;
+      }
+
+      const localTorque = new THREE.Vector3(
+        finalPitchTorque,
+        finalYawTorque,
+        finalRollTorque,
+      );
       const worldTorque = localTorque.clone().applyQuaternion(quaternion);
 
       droneBody.addTorque(

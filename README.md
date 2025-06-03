@@ -25,7 +25,8 @@ All merge requests should build without ANY type errors.
 - [ ] proper controls
   - [ ] hover mode
     - [x] take into account rotation of drone
-    - [ ] return to a stable level rotation during hover
+    - [ ] auto-level
+      - [ ] why does it work with roll but not pitch?
     - [ ] be actually balanced
   - [ ] HUD controls layout
   - [ ] mode 2 controls
