@@ -40,6 +40,8 @@ export default class BasicLevel extends Level {
 
   targetAltitude: number = 1;
 
+  targetPosition: THREE.Vector3 = new THREE.Vector3();
+
   checkpoints: Checkpoint[] = [];
 
   // Settings
@@ -94,6 +96,7 @@ export default class BasicLevel extends Level {
     // battery
     this.batteryLevel = 100;
     this.targetAltitude = 1;
+    this.targetPosition.set(0, 0, 0);
 
     // wind
     this.windVector = new THREE.Vector3(0, 0, 0);
@@ -215,6 +218,9 @@ export default class BasicLevel extends Level {
     await super.initialize();
     console.log("[BasicLevel.initialize]");
     this.drone = await createLowpolydrone(this);
+    const startPos = this.drone.body.translation();
+    this.targetPosition.set(startPos.x, 0, startPos.z);
+    this.targetAltitude = startPos.y;
     await createTU96(this, new THREE.Vector3(15, 5, 5));
     this.setupSettingsMenu();
   }
@@ -258,12 +264,32 @@ export default class BasicLevel extends Level {
       const angVel = this.drone!.body.angvel();
 
       const maxTilt = THREE.MathUtils.degToRad(10);
-      const desiredPitch =
+      let desiredPitch =
         THREE.MathUtils.clamp(-this.controls.pitch * this.settings.pitchSensitivity, -1, 1) *
         maxTilt;
-      const desiredRoll =
+      let desiredRoll =
         THREE.MathUtils.clamp(this.controls.roll * this.settings.rollSensitivity, -1, 1) *
         maxTilt;
+
+      // Lateral position hold when no manual input
+      if (this.targetControls.pitch === 0 && this.targetControls.roll === 0) {
+        const pos = this.drone!.body.translation();
+        const vel = this.drone!.body.linvel();
+        const errorX = this.targetPosition.x - pos.x;
+        const errorZ = this.targetPosition.z - pos.z;
+
+        const holdKp = 2.0;
+        const holdKd = 1.0;
+
+        const accX = holdKp * errorX - holdKd * vel.x;
+        const accZ = holdKp * errorZ - holdKd * vel.z;
+
+        desiredRoll += THREE.MathUtils.clamp(-accX / 9.81, -1, 1) * maxTilt;
+        desiredPitch += THREE.MathUtils.clamp(accZ / 9.81, -1, 1) * maxTilt;
+      }
+
+      desiredPitch = THREE.MathUtils.clamp(desiredPitch, -maxTilt, maxTilt);
+      desiredRoll = THREE.MathUtils.clamp(desiredRoll, -maxTilt, maxTilt);
 
       const pitchError = desiredPitch - euler.x;
       const rollError = desiredRoll - euler.z;
@@ -409,6 +435,14 @@ export default class BasicLevel extends Level {
     ) {
       const delayedInput = this.inputBuffer.shift()!;
       this.targetControls = delayedInput.controls;
+
+      if (
+        this.targetControls.pitch !== 0 ||
+        this.targetControls.roll !== 0
+      ) {
+        const pos = this.drone!.body.translation();
+        this.targetPosition.set(pos.x, 0, pos.z);
+      }
     }
 
     // Reset position (immediate, no delay)
@@ -418,6 +452,8 @@ export default class BasicLevel extends Level {
       this.drone!.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
       this.drone!.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
       this.batteryLevel = 100;
+      this.targetPosition.set(0, 0, 0);
+      this.targetAltitude = 1;
     }
 
     // Super battery drain (immediate)
