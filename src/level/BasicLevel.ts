@@ -49,6 +49,8 @@ export default class BasicLevel extends Level {
   temperatureChangeTimer: number;
   temperatureChangeInterval: number;
 
+  motorSpeeds: number[] = [0, 0, 0, 0];
+
   constructor() {
     super();
     console.log("[BasicLevel.constructor]");
@@ -230,6 +232,27 @@ export default class BasicLevel extends Level {
         <span class="hud-label">TEMP</span>
         <span class="hud-value" id="temperature">70°F</span>
       </div>
+      <div class="motor-thrust">
+        <div class="motor-label">MOTORS</div>
+        <div class="motor-bars">
+          <div class="motor-container">
+            <div class="motor-bar" id="motor0"></div>
+            <span class="motor-id">FL</span>
+          </div>
+          <div class="motor-container">
+            <div class="motor-bar" id="motor1"></div>
+            <span class="motor-id">FR</span>
+          </div>
+          <div class="motor-container">
+            <div class="motor-bar" id="motor2"></div>
+            <span class="motor-id">BL</span>
+          </div>
+          <div class="motor-container">
+            <div class="motor-bar" id="motor3"></div>
+            <span class="motor-id">BR</span>
+          </div>
+        </div>
+      </div>
     `;
     document.body.appendChild(hudContainer);
     // Add HUD styles
@@ -261,6 +284,38 @@ export default class BasicLevel extends Level {
       .hud-value {
         font-weight: bold;
         text-align: right;
+      }
+      .motor-thrust {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(0, 255, 0, 0.3);
+      }
+      .motor-label {
+        opacity: 0.7;
+        margin-bottom: 8px;
+      }
+      .motor-bars {
+        display: flex;
+        gap: 10px;
+      }
+      .motor-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+      .motor-bar {
+        width: 30px;
+        height: 80px;
+        background: rgba(0, 255, 0, 0.2);
+        border: 1px solid rgba(0, 255, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+        transition: background 0.1s ease;
+      }
+      .motor-id {
+        font-size: 12px;
+        opacity: 0.7;
       }
     `;
     document.head.appendChild(style);
@@ -749,6 +804,42 @@ export default class BasicLevel extends Level {
     // Temperature
     document.getElementById("temperature")!.textContent =
       `${Math.round(this.temperature)}°F`;
+
+    // Update motor thrust bars
+    // Calculate motor speeds based on control inputs (same mixing as propellers)
+    const base = this.controls.throttle;
+    const pitchGain = 0.3;
+    const rollGain = 0.3;
+    const yawGain = 0.2;
+
+    // Motor positions: FL (0), FR (1), BL (2), BR (3)
+    this.motorSpeeds[0] =
+      base +
+      this.controls.pitch * pitchGain -
+      this.controls.roll * rollGain +
+      this.controls.yaw * yawGain; // FL
+    this.motorSpeeds[1] =
+      base +
+      this.controls.pitch * pitchGain +
+      this.controls.roll * rollGain -
+      this.controls.yaw * yawGain; // FR
+    this.motorSpeeds[2] =
+      base -
+      this.controls.pitch * pitchGain -
+      this.controls.roll * rollGain -
+      this.controls.yaw * yawGain; // BL
+    this.motorSpeeds[3] =
+      base -
+      this.controls.pitch * pitchGain +
+      this.controls.roll * rollGain +
+      this.controls.yaw * yawGain; // BR
+
+    // Update visual bars
+    this.motorSpeeds.forEach((speed, i) => {
+      const motorBar = document.getElementById(`motor${i}`)!;
+      const clampedSpeed = Math.max(0, Math.min(1, speed));
+      motorBar.style.background = `linear-gradient(to top, #00ff00 ${clampedSpeed * 100}%, rgba(0, 255, 0, 0.2) ${clampedSpeed * 100}%)`;
+    });
   }
 
   updateGraphics(deltaTime: number): void {
