@@ -37,6 +37,21 @@ export default class BasicLevel extends Level {
 
   motorSpeeds: number[] = [0, 0, 0, 0];
 
+  // Settings
+  settings = {
+    fov: 115,
+    windEnabled: true,
+    pingEnabled: true,
+    temperatureMin: 50,
+    temperatureMax: 90,
+    pitchSensitivity: 1.0,
+    rollSensitivity: 1.0,
+    yawSensitivity: 1.0,
+    autoLevelStrength: 1.0,
+    autoLevelEnabled: true,
+    batteryDrainMultiplier: 1.0,
+  };
+
   constructor() {
     super();
     console.log("[BasicLevel.constructor]");
@@ -44,16 +59,16 @@ export default class BasicLevel extends Level {
     // cameras
 
     this.fpvCamera = new THREE.PerspectiveCamera(
-      // 120,
       115,
-      // 100,
-      // 90,
-      // 75,
       window.innerWidth / window.innerHeight,
       0.01,
       100,
     );
     this.fpvCamera.position.set(0, 1, 0);
+
+    // Apply initial FOV setting
+    this.fpvCamera.fov = this.settings.fov;
+    this.fpvCamera.updateProjectionMatrix();
 
     this.chaseCamera = new THREE.PerspectiveCamera(
       75,
@@ -191,6 +206,7 @@ export default class BasicLevel extends Level {
     console.log("[BasicLevel.initialize]");
     this.drone = await createLowpolydrone(this);
     await createTU96(this, new THREE.Vector3(15, 5, 5));
+    this.setupSettingsMenu();
   }
 
   updateAlways(_deltaTime: number): void {}
@@ -262,14 +278,21 @@ export default class BasicLevel extends Level {
         true,
       );
 
-      let finalPitchTorque = this.controls.pitch * config.maxPitchTorque;
-      let finalRollTorque = -this.controls.roll * config.maxRollTorque;
-      let finalYawTorque = this.controls.yaw * config.maxYawTorque;
+      let finalPitchTorque =
+        this.controls.pitch *
+        config.maxPitchTorque *
+        this.settings.pitchSensitivity;
+      let finalRollTorque =
+        -this.controls.roll *
+        config.maxRollTorque *
+        this.settings.rollSensitivity;
+      let finalYawTorque =
+        this.controls.yaw * config.maxYawTorque * this.settings.yawSensitivity;
 
       const noManualPitchRoll =
         this.targetControls.pitch === 0 && this.targetControls.roll === 0;
 
-      if (noManualPitchRoll) {
+      if (noManualPitchRoll && this.settings.autoLevelEnabled) {
         const droneRotForAutoLevel = this.drone!.body.rotation();
         const droneQuaternionTHREE = new THREE.Quaternion(
           droneRotForAutoLevel.x,
@@ -285,10 +308,16 @@ export default class BasicLevel extends Level {
         const currentPitch = euler.x;
         const currentRoll = euler.z;
 
-        const correctivePitch = -currentPitch * config.autoLevelPitchGain;
+        const correctivePitch =
+          -currentPitch *
+          config.autoLevelPitchGain *
+          this.settings.autoLevelStrength;
         finalPitchTorque += correctivePitch;
 
-        const correctiveRoll = -currentRoll * config.autoLevelRollGain;
+        const correctiveRoll =
+          -currentRoll *
+          config.autoLevelRollGain *
+          this.settings.autoLevelStrength;
         finalRollTorque += correctiveRoll;
       }
 
@@ -395,6 +424,12 @@ export default class BasicLevel extends Level {
       this.camera = this.topCamera;
     }
 
+    // Update FOV if changed
+    if (this.fpvCamera.fov !== this.settings.fov) {
+      this.fpvCamera.fov = this.settings.fov;
+      this.fpvCamera.updateProjectionMatrix();
+    }
+
     // Smooth control inputs
     const controlSmoothing = 5.0;
     this.controls.throttle +=
@@ -416,6 +451,11 @@ export default class BasicLevel extends Level {
   }
 
   updateWind(deltaTime: number): void {
+    if (!this.settings.windEnabled) {
+      this.windVector.set(0, 0, 0);
+      return;
+    }
+
     this.windChangeTimer += deltaTime;
 
     if (this.windChangeTimer >= this.windChangeInterval) {
@@ -441,9 +481,16 @@ export default class BasicLevel extends Level {
     this.temperatureChangeTimer += deltaTime;
 
     if (this.temperatureChangeTimer >= this.temperatureChangeInterval) {
+<<<<<<< Updated upstream
       // Generate new temperature target between 50°F and 90°F
       // 40 degree range
       this.targetTemperature = 50 + Math.random() * 40;
+=======
+      // Generate new temperature target between min and max
+      const range = this.settings.temperatureMax - this.settings.temperatureMin;
+      this.targetTemperature =
+        this.settings.temperatureMin + Math.random() * range;
+>>>>>>> Stashed changes
       this.temperatureChangeTimer = 0;
     }
 
@@ -454,6 +501,11 @@ export default class BasicLevel extends Level {
   }
 
   updatePing(deltaTime: number): void {
+    if (!this.settings.pingEnabled) {
+      this.pingDelay = 0;
+      return;
+    }
+
     this.pingChangeTimer += deltaTime;
 
     if (this.pingChangeTimer >= this.pingChangeInterval) {
@@ -465,6 +517,7 @@ export default class BasicLevel extends Level {
 
   updateBattery(deltaTime: number): void {
     const throttleSquared = this.controls.throttle * this.controls.throttle;
+<<<<<<< Updated upstream
     let drainRate =
       (100 / config.maxFlightTime) * (0.5 + throttleSquared * 1.5); // Base drain + throttle-based drain
 
@@ -473,6 +526,12 @@ export default class BasicLevel extends Level {
       drainRate *= 1.5;
     }
 
+=======
+    const drainRate =
+      (100 / config.maxFlightTime) *
+      (0.5 + throttleSquared * 1.5) *
+      this.settings.batteryDrainMultiplier;
+>>>>>>> Stashed changes
     this.batteryLevel = Math.max(0, this.batteryLevel - drainRate * deltaTime);
   }
 
@@ -565,6 +624,172 @@ export default class BasicLevel extends Level {
       const motorBar = document.getElementById(`motor${i}`)!;
       const clampedSpeed = Math.max(0, Math.min(1, speed));
       motorBar.style.background = `linear-gradient(to top, #00ff00 ${clampedSpeed * 100}%, rgba(0, 255, 0, 0.2) ${clampedSpeed * 100}%)`;
+    });
+  }
+
+  applySettings(newSettings: Partial<typeof this.settings>): void {
+    Object.assign(this.settings, newSettings);
+
+    // Apply FOV immediately
+    this.fpvCamera.fov = this.settings.fov;
+    this.fpvCamera.updateProjectionMatrix();
+
+    // Reset wind if disabled
+    if (!this.settings.windEnabled) {
+      this.windVector.set(0, 0, 0);
+      this.targetWindVector.set(0, 0, 0);
+    }
+
+    // Reset ping if disabled
+    if (!this.settings.pingEnabled) {
+      this.pingDelay = 0;
+      this.inputBuffer = [];
+    }
+  }
+
+  setupSettingsMenu(): void {
+    const settingsButton = document.getElementById("settings-button");
+    const settingsMenu = document.getElementById("settings-menu");
+    const settingsBack = document.getElementById("settings-back");
+    const pauseMenu = document.getElementById("pause-menu");
+
+    settingsButton?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      settingsMenu!.style.display = "flex";
+    });
+
+    settingsBack?.addEventListener("click", () => {
+      settingsMenu!.style.display = "none";
+    });
+
+    // FOV
+    const fovSlider = document.getElementById("fov-slider") as HTMLInputElement;
+    const fovValue = document.getElementById("fov-value");
+    fovSlider?.addEventListener("input", () => {
+      fovValue!.textContent = `${fovSlider.value}°`;
+      this.settings.fov = parseInt(fovSlider.value);
+    });
+
+    // Wind
+    const windToggle = document.getElementById(
+      "wind-toggle",
+    ) as HTMLInputElement;
+    windToggle?.addEventListener("change", () => {
+      this.settings.windEnabled = windToggle.checked;
+    });
+
+    // Ping
+    const pingToggle = document.getElementById(
+      "ping-toggle",
+    ) as HTMLInputElement;
+    pingToggle?.addEventListener("change", () => {
+      this.settings.pingEnabled = pingToggle.checked;
+    });
+
+    // Auto-level
+    const autoLevelToggle = document.getElementById(
+      "autolevel-toggle",
+    ) as HTMLInputElement;
+    autoLevelToggle?.addEventListener("change", () => {
+      this.settings.autoLevelEnabled = autoLevelToggle.checked;
+    });
+
+    const autoLevelSlider = document.getElementById(
+      "autolevel-slider",
+    ) as HTMLInputElement;
+    const autoLevelValue = document.getElementById("autolevel-value");
+    autoLevelSlider?.addEventListener("input", () => {
+      autoLevelValue!.textContent = autoLevelSlider.value;
+      this.settings.autoLevelStrength = parseFloat(autoLevelSlider.value);
+    });
+
+    // Temperature
+    const tempMin = document.getElementById("temp-min") as HTMLInputElement;
+    const tempMax = document.getElementById("temp-max") as HTMLInputElement;
+    tempMin?.addEventListener("change", () => {
+      this.settings.temperatureMin = parseInt(tempMin.value);
+    });
+    tempMax?.addEventListener("change", () => {
+      this.settings.temperatureMax = parseInt(tempMax.value);
+    });
+
+    // Sensitivities
+    const pitchSens = document.getElementById("pitch-sens") as HTMLInputElement;
+    const pitchSensValue = document.getElementById("pitch-sens-value");
+    pitchSens?.addEventListener("input", () => {
+      pitchSensValue!.textContent = pitchSens.value;
+      this.settings.pitchSensitivity = parseFloat(pitchSens.value);
+    });
+
+    const rollSens = document.getElementById("roll-sens") as HTMLInputElement;
+    const rollSensValue = document.getElementById("roll-sens-value");
+    rollSens?.addEventListener("input", () => {
+      rollSensValue!.textContent = rollSens.value;
+      this.settings.rollSensitivity = parseFloat(rollSens.value);
+    });
+
+    const yawSens = document.getElementById("yaw-sens") as HTMLInputElement;
+    const yawSensValue = document.getElementById("yaw-sens-value");
+    yawSens?.addEventListener("input", () => {
+      yawSensValue!.textContent = yawSens.value;
+      this.settings.yawSensitivity = parseFloat(yawSens.value);
+    });
+
+    // Battery drain
+    const batteryDrain = document.getElementById(
+      "battery-drain",
+    ) as HTMLInputElement;
+    const batteryDrainValue = document.getElementById("battery-drain-value");
+    batteryDrain?.addEventListener("input", () => {
+      batteryDrainValue!.textContent = `${batteryDrain.value}x`;
+      this.settings.batteryDrainMultiplier = parseFloat(batteryDrain.value);
+    });
+
+    // Reset to defaults
+    const resetButton = document.getElementById("reset-defaults");
+    resetButton?.addEventListener("click", () => {
+      // Reset all settings to defaults
+      this.settings = {
+        fov: 115,
+        windEnabled: true,
+        pingEnabled: true,
+        temperatureMin: 50,
+        temperatureMax: 90,
+        pitchSensitivity: 1.0,
+        rollSensitivity: 1.0,
+        yawSensitivity: 1.0,
+        autoLevelStrength: 1.0,
+        autoLevelEnabled: true,
+        batteryDrainMultiplier: 1.0,
+      };
+
+      // Update all UI elements
+      (document.getElementById("fov-slider") as HTMLInputElement).value = "115";
+      document.getElementById("fov-value")!.textContent = "115°";
+      (document.getElementById("wind-toggle") as HTMLInputElement).checked =
+        true;
+      (document.getElementById("ping-toggle") as HTMLInputElement).checked =
+        true;
+      (
+        document.getElementById("autolevel-toggle") as HTMLInputElement
+      ).checked = true;
+      (document.getElementById("autolevel-slider") as HTMLInputElement).value =
+        "1.0";
+      document.getElementById("autolevel-value")!.textContent = "1.0";
+      (document.getElementById("temp-min") as HTMLInputElement).value = "50";
+      (document.getElementById("temp-max") as HTMLInputElement).value = "90";
+      (document.getElementById("pitch-sens") as HTMLInputElement).value = "1.0";
+      document.getElementById("pitch-sens-value")!.textContent = "1.0";
+      (document.getElementById("roll-sens") as HTMLInputElement).value = "1.0";
+      document.getElementById("roll-sens-value")!.textContent = "1.0";
+      (document.getElementById("yaw-sens") as HTMLInputElement).value = "1.0";
+      document.getElementById("yaw-sens-value")!.textContent = "1.0";
+      (document.getElementById("battery-drain") as HTMLInputElement).value =
+        "1.0";
+      document.getElementById("battery-drain-value")!.textContent = "1.0x";
+
+      // Apply settings
+      this.applySettings(this.settings);
     });
   }
 

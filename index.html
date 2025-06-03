@@ -9,10 +9,122 @@
     </head>
     <body>
         <script type="module" src="/src/main.ts"></script>
-        <div id="pause-menu">
+        <div>
+            <div id="pause-menu">
             <div class="pause-content">
                 <h1>PAUSED</h1>
                 <button id="resume-button">RESUME</button>
+                <button id="settings-button">SETTINGS</button>
+                <div id="settings-menu" style="display: none">
+                    <div class="settings-content">
+                        <h2>SETTINGS</h2>
+                        <div class="settings-grid">
+                            <label>FOV</label>
+                            <input
+                                type="range"
+                                id="fov-slider"
+                                min="60"
+                                max="150"
+                                value="115"
+                            />
+                            <span id="fov-value">115°</span>
+
+                            <label>Wind</label>
+                            <input type="checkbox" id="wind-toggle" checked />
+                            <span></span>
+
+                            <label>Ping Simulation</label>
+                            <input type="checkbox" id="ping-toggle" checked />
+                            <span></span>
+
+                            <label>Auto-Level</label>
+                            <input
+                                type="checkbox"
+                                id="autolevel-toggle"
+                                checked
+                            />
+                            <span></span>
+
+                            <label>Auto-Level Strength</label>
+                            <input
+                                type="range"
+                                id="autolevel-slider"
+                                min="0"
+                                max="2"
+                                step="0.1"
+                                value="1"
+                            />
+                            <span id="autolevel-value">1.0</span>
+
+                            <label>Temperature Range</label>
+                            <div class="temp-range">
+                                <input
+                                    type="number"
+                                    id="temp-min"
+                                    min="0"
+                                    max="120"
+                                    value="50"
+                                />
+                                <span>-</span>
+                                <input
+                                    type="number"
+                                    id="temp-max"
+                                    min="0"
+                                    max="120"
+                                    value="90"
+                                />
+                                <span>°F</span>
+                            </div>
+                            <span></span>
+
+                            <label>Pitch Sensitivity</label>
+                            <input
+                                type="range"
+                                id="pitch-sens"
+                                min="0.1"
+                                max="2"
+                                step="0.1"
+                                value="1"
+                            />
+                            <span id="pitch-sens-value">1.0</span>
+
+                            <label>Roll Sensitivity</label>
+                            <input
+                                type="range"
+                                id="roll-sens"
+                                min="0.1"
+                                max="2"
+                                step="0.1"
+                                value="1"
+                            />
+                            <span id="roll-sens-value">1.0</span>
+
+                            <label>Yaw Sensitivity</label>
+                            <input
+                                type="range"
+                                id="yaw-sens"
+                                min="0.1"
+                                max="2"
+                                step="0.1"
+                                value="1"
+                            />
+                            <span id="yaw-sens-value">1.0</span>
+
+                            <label>Battery Drain Rate</label>
+                            <input
+                                type="range"
+                                id="battery-drain"
+                                min="0.1"
+                                max="3"
+                                step="0.1"
+                                value="1"
+                            />
+                            <span id="battery-drain-value">1.0x</span>
+                        </div>
+                        <button id="reset-defaults">RESET TO DEFAULTS</button>
+                        <button id="settings-back">BACK</button>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="hud">
