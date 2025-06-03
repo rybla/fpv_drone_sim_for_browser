@@ -296,7 +296,8 @@ export default class BasicLevel extends Level {
       this.drone.body.resetTorques(true);
 
       // Calculate thrust
-      const thrustMagnitude = this.controls.throttle * config.maxThrust;
+      const thrustMagnitude =
+        this.batteryLevel > 0 ? this.controls.throttle * config.maxThrust : 0;
       const rotation = this.drone.body.rotation();
 
       // Transform local up vector to world space
@@ -452,6 +453,11 @@ export default class BasicLevel extends Level {
       this.batteryLevel = 100;
     }
 
+    // Super battery drain
+    if (this.keys["b"]) {
+      this.batteryLevel = 2;
+    }
+
     // Camera switching
     if (this.keys["1"]) {
       console.log("Switching to FPV camera");
@@ -575,11 +581,27 @@ export default class BasicLevel extends Level {
       droneRot.w,
     );
 
-    // ─── Spin propellers in proportion to throttle ───
-    const spinSpeed = this.controls.throttle * 20; // rad / s at full throttle
-    this.propellers.forEach((p) => {
-      p.rotation.z += spinSpeed * deltaTime; // rotate about local Y
-    });
+    // ─── Spin propellers with throttle + full mixer (pitch / roll / yaw), stop at 0 battery ───
+    if (this.batteryLevel > 0) {
+      const base = this.controls.throttle * 20; // rad·s⁻¹ at full throttle
+      const pitchGain = 10;
+      const rollGain = 10;
+      const yawGain = 15;
+
+      this.propellers.forEach((prop, i) => {
+        const frontDir = prop.position.z < 0 ? -1 : 1; // -1 front, +1 back
+        const rightDir = prop.position.x > 0 ? 1 : -1; // +1 right, -1 left
+        const yawDir = (i & 1) === 0 ? 1 : -1; // CW / CCW rotor pair
+
+        const speed =
+          base +
+          this.controls.pitch * pitchGain * frontDir + // pitch: front vs back
+          this.controls.roll * rollGain * -rightDir + // roll: left vs right (inverted)
+          this.controls.yaw * yawGain * yawDir; // yaw: CW vs CCW
+
+        prop.rotation.z += speed * deltaTime; // rotate about local Z
+      });
+    }
 
     // cameras
 
