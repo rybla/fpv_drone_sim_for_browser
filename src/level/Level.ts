@@ -9,6 +9,12 @@ export type Controls = {
   yaw: number;
 };
 
+export type Drone = {
+  body: RAPIER.RigidBody;
+  group: THREE.Group;
+  propellers: THREE.Object3D[];
+};
+
 export default class Level {
   world: RAPIER.World;
   renderer: THREE.WebGLRenderer;
@@ -25,6 +31,12 @@ export default class Level {
 
   clock: THREE.Clock;
   accumulator: number;
+
+  drone?: Drone;
+
+  isPaused: boolean = false;
+
+  camera?: THREE.Camera;
 
   constructor() {
     console.log("[Level.constructor]");
@@ -70,10 +82,30 @@ export default class Level {
     window.addEventListener("keyup", (e) => {
       this.keys[e.key.toLowerCase()] = false;
     });
+
+    document.getElementById("resume-button")!.addEventListener("click", () => {
+      this.togglePause();
+    });
   }
 
+  updateAlways(_deltaTime: number): void {}
+  updateBeforeRender(_deltaTime: number): void {}
+  updateAfterRender(_deltaTime: number): void {}
+
   update(deltaTime: number): void {
-    // TODO: anything?
+    // Handle ESC key for pause
+    if (this.keys["escape"]) {
+      this.togglePause();
+      this.keys["escape"] = false; // Prevent multiple toggles
+    }
+
+    if (this.isPaused) {
+      this.updateAlways(deltaTime);
+    } else {
+      this.updateBeforeRender(deltaTime);
+      if (this.camera) this.renderer.render(this.scene, this.camera);
+      this.updateAfterRender(deltaTime);
+    }
   }
 
   start(): void {
@@ -87,5 +119,16 @@ export default class Level {
     }
 
     loop();
+  }
+
+  togglePause() {
+    this.isPaused = !this.isPaused;
+    const pauseMenu = document.getElementById("pause-menu")!;
+
+    if (this.isPaused) {
+      pauseMenu.style.display = "flex";
+    } else {
+      pauseMenu.style.display = "none";
+    }
   }
 }

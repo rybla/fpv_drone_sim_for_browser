@@ -4,18 +4,14 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 
 export async function createTU96(level: Level, pos: THREE.Vector3) {
-  const loader = new GLTFLoader();
-  const gltf = await loader.loadAsync("/models/gltf/tu95.gltf");
-
-  if (!gltf.scene) {
-    console.error("Failed to load TU95 model");
-    return;
-  }
-
-  const tu95Model: THREE.Group = gltf.scene;
-
   // Create a group to hold the plane
   const planeGroup = new THREE.Group();
+
+  const loader = new GLTFLoader();
+  const tu95Model = (
+    await loader.loadAsync("/models/gltf/tu95.gltf")
+  ).scene.clone();
+
   planeGroup.add(tu95Model);
 
   // Enable shadows for all meshes in the model
@@ -32,7 +28,7 @@ export async function createTU96(level: Level, pos: THREE.Vector3) {
   level.scene.add(planeGroup);
 
   // Create collider - adjust dimensions based on your TU-95 model size
-  const planeCol = level.world.createCollider(
+  const _planeCol = level.world.createCollider(
     ColliderDesc.cuboid(5, 3, 10).setTranslation(pos.x, pos.y + 3, pos.z),
   );
 }

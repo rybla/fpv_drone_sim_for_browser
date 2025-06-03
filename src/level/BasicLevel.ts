@@ -1,23 +1,14 @@
 import RAPIER from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
 import * as config from "../config";
-import Level from "./Level";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { createTank } from "../environment/tank";
-import { createBarrier } from "../environment/barrier";
+import { createLowpolydrone } from "../environment/lowpolydrone";
 import { createTU96 } from "../environment/tu95";
+import Level from "./Level";
 
 export default class BasicLevel extends Level {
   fpvCamera: THREE.PerspectiveCamera;
   chaseCamera: THREE.PerspectiveCamera;
   topCamera: THREE.PerspectiveCamera;
-  private propellers: THREE.Object3D[] = [];
-  /**
-   * the currently active camera that is being rendered from
-   */
-  currentCamera: THREE.PerspectiveCamera;
-
-  isPaused: boolean = false;
 
   batteryLevel: number;
 
@@ -25,11 +16,6 @@ export default class BasicLevel extends Level {
   targetWindVector: THREE.Vector3;
   windChangeTimer: number;
   windChangeInterval: number;
-
-  drone: {
-    body: RAPIER.RigidBody;
-    group: THREE.Group;
-  };
 
   pingDelay: number; // milliseconds
   inputBuffer: Array<{
@@ -79,7 +65,7 @@ export default class BasicLevel extends Level {
       100,
     );
 
-    this.currentCamera = this.fpvCamera;
+    this.camera = this.fpvCamera;
 
     // battery
     this.batteryLevel = 100;
@@ -103,11 +89,9 @@ export default class BasicLevel extends Level {
     this.pingChangeInterval = 3; // change ping every 3 seconds
 
     // create stuff
-    this.drone = this.createDrone();
     this.createLighting();
     this.createFloor();
     this.createSkybox();
-    this.createPauseMenu();
   }
 
   createSkybox() {
@@ -186,129 +170,38 @@ export default class BasicLevel extends Level {
     this.scene.add(pointLight2);
   }
 
-  createPauseMenu() {
-    const pauseContainer = document.createElement("div");
-    pauseContainer.id = "pause-menu";
-    pauseContainer.style.display = "none";
-    pauseContainer.innerHTML = `
-      <div class="pause-content">
-        <h1>PAUSED</h1>
-        <button id="resume-button">RESUME</button>
-        <div id="pause-hud"></div>
-      </div>
-    `;
-    document.body.appendChild(pauseContainer);
-
-    const pauseStyle = document.createElement("style");
-    pauseStyle.textContent = `
-
-    `;
-    document.head.appendChild(pauseStyle);
-
-    document.getElementById("resume-button")!.addEventListener("click", () => {
-      this.togglePause();
-    });
-  }
-
-  togglePause() {
-    this.isPaused = !this.isPaused;
-    const pauseMenu = document.getElementById("pause-menu")!;
-
-    if (this.isPaused) {
-      pauseMenu.style.display = "flex";
-    } else {
-      pauseMenu.style.display = "none";
-    }
-  }
-
-  createDrone() {
-    const droneGroup = new THREE.Group();
-    this.scene.add(droneGroup);
-
-    const droneBody = this.world.createRigidBody(
-      RAPIER.RigidBodyDesc.dynamic()
-        .setTranslation(0.0, 1.0, -2.0)
-        .setLinvel(0.0, 0.0, 0.0)
-        .setAngvel(new THREE.Vector3(0.0, 0.0, 0.0))
-        .setCcdEnabled(true),
-    );
-
-    const droneCol = this.world.createCollider(
-      RAPIER.ColliderDesc.cuboid(0.52, 0.075, 0.52)
-        .setMass(config.droneMass)
-        .setRestitution(0.2)
-        .setFriction(0.5),
-      droneBody,
-    );
-
-    return { body: droneBody, group: droneGroup };
-  }
-
   async initialize(): Promise<void> {
     await super.initialize();
     console.log("[BasicLevel.initialize]");
-
-    // load drone
-    {
-      const loader = new GLTFLoader();
-      const model = await loader.loadAsync("/models/gltf/lowpolydrone.gltf");
-      const modelClone = model.scene.clone();
-      modelClone.scale.set(0.01, 0.01, 0.01);
-      this.drone.group.add(modelClone);
-
-      // Enable shadows for all meshes in the model
-      this.drone.group.traverse((child: THREE.Object3D) => {
-        if (child instanceof THREE.Mesh) {
-          child.castShadow = true;
-          child.receiveShadow = true;
-        }
-      });
-
-      // ─── Store references to the 4 wing meshes so we can spin them ───
-      modelClone.traverse((child: THREE.Object3D) => {
-        // Wing nodes are named "Wing1", "Wing2", … in this GLTF
-        if (child.name.startsWith("Wing")) {
-          this.propellers.push(child);
-        }
-      });
-    }
-
-    // load TU95
+    this.drone = await createLowpolydrone(this);
     await createTU96(this, new THREE.Vector3(15, 5, 5));
   }
 
-  update(deltaTime: number): void {
-    // Handle ESC key for pause
-    if (this.keys["escape"]) {
-      this.togglePause();
-      this.keys["escape"] = false; // Prevent multiple toggles
-    }
+  updateAlways(_deltaTime: number): void {}
 
-    if (!this.isPaused) {
-      super.update(deltaTime);
-      this.updateControls(deltaTime);
-      this.updateWind(deltaTime);
-      this.updateTemperature(deltaTime);
-      this.updatePing(deltaTime);
-      this.updateBattery(deltaTime);
-      this.updatePhysics(deltaTime);
-      this.updateGraphics(deltaTime);
-      this.updateHUD(deltaTime);
-    }
-
-    this.renderer.render(this.scene, this.currentCamera);
+  updateBeforeRender(deltaTime: number): void {
+    this.updateControls(deltaTime);
+    this.updateWind(deltaTime);
+    this.updateTemperature(deltaTime);
+    this.updatePing(deltaTime);
+    this.updateBattery(deltaTime);
+    this.updatePhysics(deltaTime);
+    this.updateGraphics(deltaTime);
+    this.updateHUD(deltaTime);
   }
+
+  updateAfterRender(_deltaTime: number): void {}
 
   updatePhysics(deltaTime: number): void {
     while (this.accumulator >= this.world.timestep) {
       // Reset forces
-      this.drone.body.resetForces(true);
-      this.drone.body.resetTorques(true);
+      this.drone!.body.resetForces(true);
+      this.drone!.body.resetTorques(true);
 
       // Calculate thrust
       const thrustMagnitude =
         this.batteryLevel > 0 ? this.controls.throttle * config.maxThrust : 0;
-      const rotation = this.drone.body.rotation();
+      const rotation = this.drone!.body.rotation();
 
       // Transform local up vector to world space
       const localUp = new THREE.Vector3(0, 1, 0);
@@ -327,11 +220,11 @@ export default class BasicLevel extends Level {
         y: worldUp.y * thrustMagnitude,
         z: worldUp.z * thrustMagnitude,
       };
-      this.drone.body.addForce(thrustVector, true);
+      this.drone!.body.addForce(thrustVector, true);
 
       /// Apply wind velocity
-      const currentVel = this.drone.body.linvel();
-      this.drone.body.setLinvel(
+      const currentVel = this.drone!.body.linvel();
+      this.drone!.body.setLinvel(
         {
           x: currentVel.x + this.windVector.x * deltaTime,
           y: currentVel.y,
@@ -348,7 +241,7 @@ export default class BasicLevel extends Level {
         this.targetControls.pitch === 0 && this.targetControls.roll === 0;
 
       if (noManualPitchRoll) {
-        const droneRotForAutoLevel = this.drone.body.rotation();
+        const droneRotForAutoLevel = this.drone!.body.rotation();
         const droneQuaternionTHREE = new THREE.Quaternion(
           droneRotForAutoLevel.x,
           droneRotForAutoLevel.y,
@@ -377,7 +270,7 @@ export default class BasicLevel extends Level {
       );
       const worldTorque = localTorque.clone().applyQuaternion(quaternion);
 
-      this.drone.body.addTorque(
+      this.drone!.body.addTorque(
         {
           x: worldTorque.x,
           y: worldTorque.y,
@@ -447,10 +340,10 @@ export default class BasicLevel extends Level {
 
     // Reset position (immediate, no delay)
     if (this.keys["r"]) {
-      this.drone.body.setTranslation({ x: 0, y: 1, z: 0 }, true);
-      this.drone.body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
-      this.drone.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
-      this.drone.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+      this.drone!.body.setTranslation({ x: 0, y: 1, z: 0 }, true);
+      this.drone!.body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
+      this.drone!.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      this.drone!.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
       this.batteryLevel = 100;
     }
 
@@ -462,15 +355,15 @@ export default class BasicLevel extends Level {
     // Camera switching (immediate)
     if (this.keys["1"]) {
       console.log("Switching to FPV camera");
-      this.currentCamera = this.fpvCamera;
+      this.camera = this.fpvCamera;
     }
     if (this.keys["2"]) {
       console.log("Switching to chase camera");
-      this.currentCamera = this.chaseCamera;
+      this.camera = this.chaseCamera;
     }
     if (this.keys["3"]) {
       console.log("Switching to top camera");
-      this.currentCamera = this.topCamera;
+      this.camera = this.topCamera;
     }
 
     // Smooth control inputs
@@ -547,8 +440,8 @@ export default class BasicLevel extends Level {
     this.batteryLevel = Math.max(0, this.batteryLevel - drainRate * deltaTime);
   }
 
-  updateHUD(deltaTime: number) {
-    const vel = this.drone.body.linvel();
+  updateHUD(_deltaTime: number) {
+    const vel = this.drone!.body.linvel();
     const totalVelocity = Math.sqrt(
       vel.x * vel.x + vel.y * vel.y + vel.z * vel.z,
     );
@@ -567,7 +460,7 @@ export default class BasicLevel extends Level {
     }
     // Convert quaternion to euler angles
     const euler = new THREE.Euler();
-    euler.setFromQuaternion(this.drone.group.quaternion);
+    euler.setFromQuaternion(this.drone!.group.quaternion);
     const pitch = THREE.MathUtils.radToDeg(euler.x);
     const yaw = THREE.MathUtils.radToDeg(euler.y);
     const roll = THREE.MathUtils.radToDeg(euler.z);
@@ -641,10 +534,10 @@ export default class BasicLevel extends Level {
 
   updateGraphics(deltaTime: number): void {
     // drone
-    const dronePos = this.drone.body.translation();
-    const droneRot = this.drone.body.rotation();
-    this.drone.group.position.set(dronePos.x, dronePos.y, dronePos.z);
-    this.drone.group.quaternion.set(
+    const dronePos = this.drone!.body.translation();
+    const droneRot = this.drone!.body.rotation();
+    this.drone!.group.position.set(dronePos.x, dronePos.y, dronePos.z);
+    this.drone!.group.quaternion.set(
       droneRot.x,
       droneRot.y,
       droneRot.z,
@@ -658,14 +551,14 @@ export default class BasicLevel extends Level {
       const rollGain = 10;
       const yawGain = 15;
 
-      this.propellers.forEach((prop, i) => {
+      this.drone!.propellers.forEach((prop, i) => {
         // Get propeller position in drone's local space
         const worldPos = new THREE.Vector3();
         prop.getWorldPosition(worldPos);
         const droneWorldPos = new THREE.Vector3();
-        this.drone.group.getWorldPosition(droneWorldPos);
+        this.drone!.group.getWorldPosition(droneWorldPos);
         const droneWorldQuat = new THREE.Quaternion();
-        this.drone.group.getWorldQuaternion(droneWorldQuat);
+        this.drone!.group.getWorldQuaternion(droneWorldQuat);
 
         // Transform to drone's local space
         const localPos = worldPos.sub(droneWorldPos);
@@ -715,7 +608,4 @@ export default class BasicLevel extends Level {
     this.topCamera.position.set(dronePos.x, 10, dronePos.z);
     this.topCamera.lookAt(dronePos.x, dronePos.y, dronePos.z);
   }
-}
-function createLowPolyDrone(scene: any, world: any, arg2: THREE.Vector3) {
-  throw new Error("Function not implemented.");
 }
