@@ -231,8 +231,13 @@ export default class BasicLevel extends Level {
       this.drone!.body.resetTorques(true);
 
       // Calculate thrust
+      // Adjust for air density changes caused by temperature
+      const standardTempK = 288.15; // 15°C in Kelvin
+      const envTempK = ((this.environmentTemperature - 32) * (5 / 9)) + 273.15;
+      const airDensityFactor = standardTempK / envTempK;
       const thrustMagnitude =
-        this.batteryLevel > 0 ? this.controls.throttle * config.maxThrust : 0;
+        (this.batteryLevel > 0 ? this.controls.throttle * config.maxThrust : 0) *
+        airDensityFactor;
       const rotation = this.drone!.body.rotation();
 
       // Transform local up vector to world space
@@ -647,7 +652,6 @@ export default class BasicLevel extends Level {
     const settingsButton = document.getElementById("settings-button");
     const settingsMenu = document.getElementById("settings-menu");
     const settingsBack = document.getElementById("settings-back");
-    const pauseMenu = document.getElementById("pause-menu");
 
     settingsButton?.addEventListener("click", (e) => {
       e.stopPropagation();

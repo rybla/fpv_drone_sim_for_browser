@@ -35,7 +35,7 @@ All merge requests should build without ANY type errors.
 - stuff to simulate:
   - [ ] temperature
     - [x] affects battery drain
-    - [ ] affects air density, makes the drone faster or slower
+    - [x] affects air density, makes the drone faster or slower
     - [ ] affects battery overheating
   - [x] battery levels
   - [x] air speed affects propellers
