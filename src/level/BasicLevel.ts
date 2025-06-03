@@ -225,7 +225,9 @@ export default class BasicLevel extends Level {
     this.updateBattery(deltaTime);
 
     const motorsActive =
-      this.controls.throttle > 0 && this.batteryLevel > 0 && !this.batteryOverheated;
+      this.controls.throttle > 0 &&
+      this.batteryLevel > 0 &&
+      !this.batteryOverheated;
     const tempChangeRate = 10;
     if (motorsActive) {
       this.batteryTemperature += tempChangeRate * deltaTime;
@@ -517,7 +519,8 @@ export default class BasicLevel extends Level {
       // Generate new temperature target between 50°F and 90°F
       // 40 degree range
       const range = this.settings.temperatureMax - this.settings.temperatureMin;
-      this.targetEnvironmentTemperature = 50 + Math.random() * 40 * range;
+      this.targetEnvironmentTemperature =
+        this.settings.temperatureMin + Math.random() * range;
 
       this.environmentTemperatureChangeTimer = 0;
     }
