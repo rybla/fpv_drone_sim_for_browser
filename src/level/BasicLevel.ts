@@ -205,9 +205,6 @@ export default class BasicLevel extends Level {
     const droneGroup = new THREE.Group();
     this.scene.add(droneGroup);
 
-    const armLength = 0.8;
-    const armThickness = 0.05;
-
     const droneBody = this.world.createRigidBody(
       RAPIER.RigidBodyDesc.dynamic()
         .setTranslation(0.0, 1.0, -2.0)
