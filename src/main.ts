@@ -6,6 +6,19 @@ import RAPIER, {
 } from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
 import "./style.css";
+import { createHUD, updateHUD } from "./ui/hud";
+import type { Controls } from "./common";
+import {
+  autoLevelPitchGain,
+  autoLevelRollGain,
+  droneMass,
+  hoverThrottle,
+  maxFlightTime,
+  maxPitchTorque,
+  maxRollTorque,
+  maxThrust,
+  maxYawTorque,
+} from "./config";
 
 async function main() {
   await RAPIER.init();
@@ -86,83 +99,17 @@ async function main() {
   document.body.appendChild(renderer.domElement);
 
   // ---------------------------------------------------------------------------
-  // HUD
+  // hud
   // ---------------------------------------------------------------------------
 
-  const hudContainer = document.createElement("div");
-  hudContainer.id = "hud";
-  hudContainer.innerHTML = `
-    <div class="hud-item">
-      <span class="hud-label">PITCH</span>
-      <span class="hud-value" id="pitch">0°</span>
-    </div>
-    <div class="hud-item">
-      <span class="hud-label">ROLL</span>
-      <span class="hud-value" id="roll">0°</span>
-    </div>
-    <div class="hud-item">
-      <span class="hud-label">YAW</span>
-      <span class="hud-value" id="yaw">0°</span>
-    </div>
-    <div class="hud-item">
-      <span class="hud-label">VELOCITY</span>
-      <span class="hud-value" id="velocity">0.0 m/s</span>
-    </div>
-    <div class="hud-item">
-      <span class="hud-label">GROUND SPEED</span>
-      <span class="hud-value" id="groundspeed">0.0 m/s</span>
-    </div>
-    <div class="hud-item">
-      <span class="hud-label">BATTERY</span>
-      <span class="hud-value" id="battery">100%</span>
-    </div>
-  `;
-  document.body.appendChild(hudContainer);
-
-  // Add HUD styles
-  const style = document.createElement("style");
-  style.textContent = `
-    #hud {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 100;
-      color: #00ff00;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 15px;
-      border-radius: 5px;
-      border: 1px solid rgba(0, 255, 0, 0.3);
-    }
-    .hud-item {
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      min-width: 200px;
-    }
-    .hud-label {
-      opacity: 0.7;
-      margin-right: 20px;
-    }
-    .hud-value {
-      font-weight: bold;
-      text-align: right;
-    }
-  `;
-  document.head.appendChild(style);
+  createHUD();
 
   // ---------------------------------------------------------------------------
   // controls
   // ---------------------------------------------------------------------------
 
-  // Physics constants
-  const droneMass = 0.065;
-  const maxThrust = 1.28; // N (2x hover thrust)
-  const hoverThrottle = (droneMass * 9.81) / maxThrust;
-
   // Control inputs
-  const controls = {
+  const controls: Controls = {
     throttle: hoverThrottle,
     pitch: 0,
     roll: 0,
@@ -173,16 +120,9 @@ async function main() {
 
   // Battery state
   let batteryLevel = 100; // percentage
-  const maxFlightTime = 510; // 8.5 minutes in seconds
 
+  // for each key, whether or not it's currently being held down
   const keys: { [key: string]: boolean } = {};
-
-  const maxPitchTorque = 0.015;
-  const maxRollTorque = 0.015;
-  const maxYawTorque = 0.008;
-
-  const autoLevelPitchGain = 0.03;
-  const autoLevelRollGain = 0.03;
 
   // Input handling
   window.addEventListener("keydown", (e) => {
@@ -525,6 +465,15 @@ async function main() {
       (targetControls.yaw - controls.yaw) * controlSmoothing * deltaTime;
 
     // ---------------------------------------------------------------------------
+    // update battery
+    // ---------------------------------------------------------------------------
+
+    // Update battery
+    const throttleSquared = controls.throttle * controls.throttle;
+    const drainRate = (100 / maxFlightTime) * (0.5 + throttleSquared * 1.5); // Base drain + throttle-based drain
+    batteryLevel = Math.max(0, batteryLevel - drainRate * deltaTime);
+
+    // ---------------------------------------------------------------------------
     // update physics
     // ---------------------------------------------------------------------------
 
@@ -617,44 +566,12 @@ async function main() {
     droneMesh.position.set(dronePos.x, dronePos.y, dronePos.z);
     droneMesh.quaternion.set(droneRot.x, droneRot.y, droneRot.z, droneRot.w);
 
-    // Update HUD
-    const vel = droneBody.linvel();
-    const totalVelocity = Math.sqrt(
-      vel.x * vel.x + vel.y * vel.y + vel.z * vel.z,
-    );
-    const groundSpeed = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
-
-    // Update battery
-    const throttleSquared = controls.throttle * controls.throttle;
-    const drainRate = (100 / maxFlightTime) * (0.5 + throttleSquared * 1.5); // Base drain + throttle-based drain
-    batteryLevel = Math.max(0, batteryLevel - drainRate * deltaTime);
-    document.getElementById("battery")!.textContent =
-      `${Math.floor(batteryLevel)}%`;
-
-    // Battery color based on level
-    const batteryElement = document.getElementById("battery")!;
-    if (batteryLevel > 30) {
-      batteryElement.style.color = "#00ff00";
-    } else if (batteryLevel > 15) {
-      batteryElement.style.color = "#ffaa00";
-    } else {
-      batteryElement.style.color = "#ff0000";
-    }
-
-    // Convert quaternion to euler angles
-    const euler = new THREE.Euler();
-    euler.setFromQuaternion(droneMesh.quaternion);
-    const pitch = THREE.MathUtils.radToDeg(euler.x);
-    const yaw = THREE.MathUtils.radToDeg(euler.y);
-    const roll = THREE.MathUtils.radToDeg(euler.z);
-
-    document.getElementById("pitch")!.textContent = `${pitch.toFixed(1)}°`;
-    document.getElementById("roll")!.textContent = `${roll.toFixed(1)}°`;
-    document.getElementById("yaw")!.textContent = `${yaw.toFixed(1)}°`;
-    document.getElementById("velocity")!.textContent =
-      `${totalVelocity.toFixed(1)} m/s`;
-    document.getElementById("groundspeed")!.textContent =
-      `${groundSpeed.toFixed(1)} m/s`;
+    updateHUD({
+      batteryLevel,
+      controls,
+      droneBody,
+      droneMesh,
+    });
 
     // spin propellers based on throttle
     for (const prop of propellers) {
