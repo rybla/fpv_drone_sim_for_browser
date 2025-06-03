@@ -309,7 +309,7 @@ export default class BasicLevel extends Level {
         const { maxAccel, brakeAccel, earlyBrakeFactor, w, zeta } =
           this.lateralTuning;
 
-        const computeAxis = (error: numbwer, v: number): number => {
+        const computeAxis = (error: number, v: number): number => {
           const speed = Math.abs(v);
           const speedFactor = Math.min(2, speed / 5);
           const dynamicBrake = brakeAccel * (1 + speedFactor);
