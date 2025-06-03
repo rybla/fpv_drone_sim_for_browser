@@ -1,4 +1,3 @@
-import RAPIER from "@dimforge/rapier3d-compat";
 import BasicLevel from "./level/BasicLevel";
 
 async function main() {
