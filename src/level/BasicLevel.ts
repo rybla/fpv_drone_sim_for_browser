@@ -18,7 +18,6 @@ export default class BasicLevel extends Level {
   drone: {
     body: RAPIER.RigidBody;
     group: THREE.Group;
-    propellers: THREE.Mesh[];
   };
 
   constructor() {
@@ -203,63 +202,11 @@ export default class BasicLevel extends Level {
   }
 
   createDrone() {
-    // // Use a darker metallic material so the lighting has nicer highlights
-    // const droneMaterial = new THREE.MeshStandardMaterial({
-    //   color: 0x555555,
-    //   roughness: 0.3,
-    //   metalness: 0.7,
-    // });
-
     const droneGroup = new THREE.Group();
     this.scene.add(droneGroup);
 
-    // // chassis
-    // const chassisGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.6);
-    // const chassisMesh = new THREE.Mesh(chassisGeometry, droneMaterial);
-    // chassisMesh.castShadow = true;
-    // droneGroup.add(chassisMesh);
-
-    // // arms
-    // const armLength = 0.8;
-    // const armThickness = 0.05;
-    // const armXGeometry = new THREE.BoxGeometry(
-    //   armLength,
-    //   armThickness,
-    //   armThickness,
-    // );
-    // const armXMesh = new THREE.Mesh(armXGeometry, droneMaterial);
-    // armXMesh.castShadow = true;
-    // droneGroup.add(armXMesh);
-
-    // const armZGeometry = new THREE.BoxGeometry(
-    //   armThickness,
-    //   armThickness,
-    //   armLength,
-    // );
-    // const armZMesh = new THREE.Mesh(armZGeometry, droneMaterial);
-    // armZMesh.castShadow = true;
-    // droneGroup.add(armZMesh);
-
     const armLength = 0.8;
     const armThickness = 0.05;
-
-    // propellers
-    const propellers: THREE.Mesh[] = [];
-    const propGeometry = new THREE.CylinderGeometry(0.12, 0.12, 0.02, 16);
-    const propMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
-    const propPositions = [
-      [armLength / 2, 0.05, 0],
-      [-armLength / 2, 0.05, 0],
-      [0, 0.05, armLength / 2],
-      [0, 0.05, -armLength / 2],
-    ];
-    for (const pos of propPositions) {
-      const prop = new THREE.Mesh(propGeometry, propMaterial);
-      prop.castShadow = true;
-      prop.position.set(pos[0], pos[1], pos[2]);
-      droneGroup.add(prop);
-      propellers.push(prop);
-    }
 
     const droneBody = this.world.createRigidBody(
       RAPIER.RigidBodyDesc.dynamic()
@@ -277,7 +224,7 @@ export default class BasicLevel extends Level {
       droneBody,
     );
 
-    return { body: droneBody, group: droneGroup, propellers };
+    return { body: droneBody, group: droneGroup };
   }
 
   async initialize(): Promise<void> {
@@ -549,11 +496,6 @@ export default class BasicLevel extends Level {
       droneRot.z,
       droneRot.w,
     );
-
-    // spin propellers based on throttle
-    for (const prop of this.drone.propellers) {
-      prop.rotation.y += this.controls.throttle * 20 * deltaTime;
-    }
 
     // cameras
 
