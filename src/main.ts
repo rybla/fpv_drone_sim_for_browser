@@ -186,7 +186,7 @@ async function main() {
       .setCcdEnabled(true),
   );
 
-  world.createCollider(
+  const droneCol = world.createCollider(
     ColliderDesc.cuboid(0.52, 0.075, 0.52)
       .setMass(droneMass)
       .setRestitution(0.2)
