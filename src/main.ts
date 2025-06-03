@@ -23,10 +23,17 @@ async function main() {
   const scene = new THREE.Scene();
 
   // ---------------------------------------------------------------------------
+  // texture loader
+  // ---------------------------------------------------------------------------
+
+  const textureLoader = new THREE.TextureLoader();
+
+  // ---------------------------------------------------------------------------
   // skybox
   // ---------------------------------------------------------------------------
-  const loader = new THREE.CubeTextureLoader();
-  const skybox = loader
+
+  const cubeTextureLoader = new THREE.CubeTextureLoader();
+  const skybox = cubeTextureLoader
     .setPath("/")
     .load([
       "nightsky_rt.png",
@@ -192,20 +199,31 @@ async function main() {
   // floor
   // ---------------------------------------------------------------------------
 
-  // Slightly rough concrete-like floor material
+  const floorSize = 10000;
+  const floorTexture = textureLoader.load("/floor.png");
+  floorTexture.wrapS = THREE.RepeatWrapping;
+  floorTexture.wrapT = THREE.RepeatWrapping;
+  const textureRepeats = floorSize / 20;
+  floorTexture.repeat.set(textureRepeats, textureRepeats);
+
   const floorMaterial = new THREE.MeshStandardMaterial({
     color: 0x808080,
     roughness: 0.8,
     metalness: 0.2,
+    map: floorTexture,
   });
-  const floorGeometry = new THREE.BoxGeometry(30, 0.2, 30);
+  const floorGeometry = new THREE.BoxGeometry(floorSize, 0.2, floorSize);
   floorGeometry.computeVertexNormals();
   const floor = new THREE.Mesh(floorGeometry, floorMaterial);
   floor.position.y = -0.1;
   floor.receiveShadow = true;
   scene.add(floor);
   world.createCollider(
-    RAPIER.ColliderDesc.cuboid(15, 0.1, 15).setTranslation(0, -0.1, 0),
+    RAPIER.ColliderDesc.cuboid(
+      floorSize / 2,
+      0.1,
+      floorSize / 2,
+    ).setTranslation(0, -0.1, 0),
   );
 
   // ---------------------------------------------------------------------------

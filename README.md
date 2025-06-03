@@ -39,6 +39,7 @@ All merge requests should build without ANY type errors.
 - [x] drone model
 - [x] fpv camera
 - [x] collisions
+- [x] floor texture
 
 ## Initial Notes
 
