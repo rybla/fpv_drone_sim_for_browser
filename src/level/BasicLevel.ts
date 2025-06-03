@@ -17,6 +17,8 @@ export default class BasicLevel extends Level {
    */
   currentCamera: THREE.PerspectiveCamera;
 
+  isPaused: boolean = false;
+
   batteryLevel: number;
 
   windVector: THREE.Vector3;
@@ -74,6 +76,7 @@ export default class BasicLevel extends Level {
     this.createHUD();
     this.createFloor();
     this.createSkybox();
+    this.createPauseMenu();
     createTU95(this.scene, this.world, new THREE.Vector3(15, 5, 5));
   }
 
@@ -225,6 +228,107 @@ export default class BasicLevel extends Level {
     document.head.appendChild(style);
   }
 
+  createPauseMenu() {
+    const pauseContainer = document.createElement("div");
+    pauseContainer.id = "pause-menu";
+    pauseContainer.style.display = "none";
+    pauseContainer.innerHTML = `
+      <div class="pause-content">
+        <h1>PAUSED</h1>
+        <button id="resume-button">RESUME</button>
+        <div id="pause-hud"></div>
+      </div>
+    `;
+    document.body.appendChild(pauseContainer);
+
+    const pauseStyle = document.createElement("style");
+    pauseStyle.textContent = `
+      #pause-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+      .pause-content {
+        text-align: center;
+        color: white;
+      }
+      .pause-content h1 {
+        font-family: 'Courier New', monospace;
+        font-size: 48px;
+        margin-bottom: 30px;
+        color: #00ff00;
+      }
+      #resume-button {
+        font-family: 'Courier New', monospace;
+        font-size: 24px;
+        padding: 15px 40px;
+        background: transparent;
+        border: 2px solid #00ff00;
+        color: #00ff00;
+        cursor: pointer;
+        margin-bottom: 30px;
+      }
+      #resume-button:hover {
+        background: rgba(0, 255, 0, 0.1);
+      }
+      #pause-hud {
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        color: #00ff00;
+        text-align: left;
+        display: inline-block;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid rgba(0, 255, 0, 0.3);
+      }
+      #pause-hud .hud-item {
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        min-width: 200px;
+      }
+      #pause-hud .hud-label {
+        opacity: 0.7;
+        margin-right: 20px;
+      }
+      #pause-hud .hud-value {
+        font-weight: bold;
+        text-align: right;
+      }
+    `;
+    document.head.appendChild(pauseStyle);
+
+    document.getElementById("resume-button")!.addEventListener("click", () => {
+      this.togglePause();
+    });
+  }
+
+  togglePause() {
+    this.isPaused = !this.isPaused;
+    const pauseMenu = document.getElementById("pause-menu")!;
+    const normalHud = document.getElementById("hud")!;
+
+    if (this.isPaused) {
+      pauseMenu.style.display = "flex";
+      normalHud.style.display = "none";
+
+      // Copy HUD content to pause menu
+      const pauseHud = document.getElementById("pause-hud")!;
+      pauseHud.innerHTML = normalHud.innerHTML;
+    } else {
+      pauseMenu.style.display = "none";
+      normalHud.style.display = "block";
+    }
+  }
+
   createDrone() {
     const droneGroup = new THREE.Group();
     this.scene.add(droneGroup);
@@ -279,13 +383,27 @@ export default class BasicLevel extends Level {
   }
 
   update(deltaTime: number): void {
-    super.update(deltaTime);
-    this.updateControls(deltaTime);
-    this.updateWind(deltaTime);
-    this.updateBattery(deltaTime);
-    this.updatePhysics(deltaTime);
-    this.updateGraphics(deltaTime);
-    this.updateHUD(deltaTime);
+    // Handle ESC key for pause
+    if (this.keys["escape"]) {
+      this.togglePause();
+      this.keys["escape"] = false; // Prevent multiple toggles
+    }
+
+    if (!this.isPaused) {
+      super.update(deltaTime);
+      this.updateControls(deltaTime);
+      this.updateWind(deltaTime);
+      this.updateBattery(deltaTime);
+      this.updatePhysics(deltaTime);
+      this.updateGraphics(deltaTime);
+      this.updateHUD(deltaTime);
+    } else {
+      // Update pause menu HUD
+      const pauseHud = document.getElementById("pause-hud")!;
+      const normalHud = document.getElementById("hud")!;
+      pauseHud.innerHTML = normalHud.innerHTML;
+    }
+
     this.renderer.render(this.scene, this.currentCamera);
   }
 
