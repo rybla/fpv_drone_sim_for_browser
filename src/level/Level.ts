@@ -1132,7 +1132,7 @@ export default class Level {
           this.controls.roll * rollGain * -rightDir + // roll: left vs right (inverted)
           this.controls.yaw * yawGain * yawDir; // yaw: CW vs CCW
 
-        prop.rotation.z += speed * deltaTime; // rotate about local Z
+        prop.rotation.z += speed * 4 * deltaTime; // rotate about local Z
       });
     }
 
