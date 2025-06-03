@@ -414,8 +414,35 @@ async function main() {
     // update controls
     // ---------------------------------------------------------------------------
 
-    // Handle input
     const throttleSpeed = 1.0;
+
+    // hover throttle that takes into account drone rotation
+    let dynamicHoverThrottleToUse: number;
+
+    const currentDroneRotation = droneBody.rotation();
+    const droneQuaternion = new THREE.Quaternion(
+      currentDroneRotation.x,
+      currentDroneRotation.y,
+      currentDroneRotation.z,
+      currentDroneRotation.w,
+    );
+    const droneLocalUp = new THREE.Vector3(0, 1, 0);
+    const droneWorldUp = droneLocalUp.clone().applyQuaternion(droneQuaternion);
+    const alignmentFactor = droneWorldUp.y;
+
+    const calculatedBaseHoverThrottle =
+      (droneMass * Math.abs(world.gravity.y)) / maxThrust;
+
+    if (alignmentFactor <= 0) {
+      dynamicHoverThrottleToUse = 0.0;
+    } else {
+      dynamicHoverThrottleToUse =
+        calculatedBaseHoverThrottle / Math.max(alignmentFactor, 0.1);
+      dynamicHoverThrottleToUse = Math.min(
+        1.0,
+        Math.max(0.0, dynamicHoverThrottleToUse),
+      );
+    }
 
     // Throttle (up/down arrows)
     if (keys["arrowup"]) {
