@@ -1,7 +1,6 @@
 import RAPIER from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
 import * as config from "../config";
-import { createLowpolydrone } from "../environment/lowpolydrone";
 import { createTU96 } from "../environment/tu95";
 import { createCheckpoint, type Checkpoint } from "../environment/checkpoint";
 import Level from "./Level";
@@ -218,14 +217,11 @@ export default class BasicLevel extends Level {
   async initialize(): Promise<void> {
     await super.initialize();
     console.log("[BasicLevel.initialize]");
-<<<<<<< Updated upstream
-    this.drone = await createLowpolydrone(this);
+    this.drone = await createNanodrone(this);
     const startPos = this.drone.body.translation();
     this.targetPosition.set(startPos.x, 0, startPos.z);
     this.targetAltitude = startPos.y;
-=======
-    this.drone = await createNanodrone(this);
->>>>>>> Stashed changes
+
     await createTU96(this, new THREE.Vector3(15, 5, 5));
     this.setupSettingsMenu();
   }
@@ -256,14 +252,6 @@ export default class BasicLevel extends Level {
       const standardTempK = 288.15; // 15°C in Kelvin
       const envTempK = (this.environmentTemperature - 32) * (5 / 9) + 273.15;
       const airDensityFactor = standardTempK / envTempK;
-<<<<<<< Updated upstream
-=======
-      const thrustMagnitude =
-        (this.batteryLevel > 0
-          ? this.controls.throttle * config.maxThrust
-          : 0) * airDensityFactor;
-      const rotation = this.drone!.body.rotation();
->>>>>>> Stashed changes
 
       const rotation = this.drone!.body.rotation();
       const quaternion = new THREE.Quaternion(
@@ -278,11 +266,17 @@ export default class BasicLevel extends Level {
 
       const maxTilt = THREE.MathUtils.degToRad(10);
       let desiredPitch =
-        THREE.MathUtils.clamp(-this.controls.pitch * this.settings.pitchSensitivity, -1, 1) *
-        maxTilt;
+        THREE.MathUtils.clamp(
+          -this.controls.pitch * this.settings.pitchSensitivity,
+          -1,
+          1,
+        ) * maxTilt;
       let desiredRoll =
-        THREE.MathUtils.clamp(this.controls.roll * this.settings.rollSensitivity, -1, 1) *
-        maxTilt;
+        THREE.MathUtils.clamp(
+          this.controls.roll * this.settings.rollSensitivity,
+          -1,
+          1,
+        ) * maxTilt;
 
       // Lateral position hold when no manual input
       if (this.targetControls.pitch === 0 && this.targetControls.roll === 0) {
@@ -310,16 +304,15 @@ export default class BasicLevel extends Level {
       const angleKp = 50.0;
       const angleKd = 12.0;
 
-      let finalPitchTorque = THREE.MathUtils.clamp(
-        angleKp * pitchError - angleKd * angVel.x,
-        -1,
-        1,
-      ) * config.maxPitchTorque;
-      let finalRollTorque = THREE.MathUtils.clamp(
-        angleKp * rollError - angleKd * angVel.z,
-        -1,
-        1,
-      ) * config.maxRollTorque;
+      let finalPitchTorque =
+        THREE.MathUtils.clamp(
+          angleKp * pitchError - angleKd * angVel.x,
+          -1,
+          1,
+        ) * config.maxPitchTorque;
+      let finalRollTorque =
+        THREE.MathUtils.clamp(angleKp * rollError - angleKd * angVel.z, -1, 1) *
+        config.maxRollTorque;
       let finalYawTorque =
         this.controls.yaw * config.maxYawTorque * this.settings.yawSensitivity -
         angVel.y * 0.05;
@@ -373,7 +366,6 @@ export default class BasicLevel extends Level {
         },
         true,
       );
-
 
       const localTorque = new THREE.Vector3(
         finalPitchTorque,
@@ -449,10 +441,7 @@ export default class BasicLevel extends Level {
       const delayedInput = this.inputBuffer.shift()!;
       this.targetControls = delayedInput.controls;
 
-      if (
-        this.targetControls.pitch !== 0 ||
-        this.targetControls.roll !== 0
-      ) {
+      if (this.targetControls.pitch !== 0 || this.targetControls.roll !== 0) {
         const pos = this.drone!.body.translation();
         this.targetPosition.set(pos.x, 0, pos.z);
       }
@@ -516,7 +505,9 @@ export default class BasicLevel extends Level {
     // Update target altitude based on throttle input
     const altitudeRate = 2.0; // m/s per throttle unit
     this.targetAltitude +=
-      (this.controls.throttle - config.hoverThrottle) * altitudeRate * deltaTime;
+      (this.controls.throttle - config.hoverThrottle) *
+      altitudeRate *
+      deltaTime;
     this.targetAltitude = Math.max(0.1, this.targetAltitude);
   }
 
