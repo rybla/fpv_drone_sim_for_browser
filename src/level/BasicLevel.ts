@@ -356,7 +356,6 @@ export default class BasicLevel extends Level {
           THREE.MathUtils.clamp(-accX / 9.81, -1, 1) * maxBrakeTilt;
         desiredPitch +=
           THREE.MathUtils.clamp(accZ / 9.81, -1, 1) * maxBrakeTilt;
-        w;
       }
 
       const pitchError = desiredPitch - euler.x;
@@ -407,14 +406,16 @@ export default class BasicLevel extends Level {
       const altKp = 40.0;
       const altKd = 15.0;
 
-      const requiredAccel = altKp * altError - altKd * vertVel + 9.81;
       let thrustMagnitude = 0;
-      if (this.batteryLevel > 0) {
+      if (this.batteryLevel > 0 && this.controls.throttle > 0.1) {
+        const requiredAccel = altKp * altError - altKd * vertVel + 9.81;
         thrustMagnitude = THREE.MathUtils.clamp(
           (requiredAccel * config.droneMass) / (airDensityFactor * worldUp.y),
           0,
           config.maxThrust,
         );
+      } else if (this.controls.throttle > 0.1) {
+        this.targetAltitude = this.drone!.body.translation().y;
       }
 
       const thrustVector = {
@@ -585,11 +586,17 @@ export default class BasicLevel extends Level {
 
     // Update target altitude based on throttle input
     const altitudeRate = 2.0; // m/s per throttle unit
-    this.targetAltitude +=
-      (this.controls.throttle - config.hoverThrottle) *
-      altitudeRate *
-      deltaTime;
-    this.targetAltitude = Math.max(0.1, this.targetAltitude);
+    if (this.controls.throttle > 0.1) {
+      this.targetAltitude +=
+        (this.controls.throttle - config.hoverThrottle) *
+        altitudeRate *
+        deltaTime;
+      this.targetAltitude = Math.max(0.1, this.targetAltitude);
+    } else {
+      // Keep target altitude synced with actual altitude when throttle is off
+      const altitude = this.drone!.body.translation().y;
+      this.targetAltitude = altitude;
+    }
   }
 
   updateWind(deltaTime: number): void {
@@ -721,6 +728,9 @@ export default class BasicLevel extends Level {
       `${totalVelocity.toFixed(1)} m/s`;
     document.getElementById("groundspeed")!.textContent =
       `${groundSpeed.toFixed(1)} m/s`;
+    const altitude = this.drone!.body.translation().y;
+    document.getElementById("altitude")!.textContent =
+      `${altitude.toFixed(1)} m`;
 
     // Wind
     const windSpeed = Math.sqrt(
