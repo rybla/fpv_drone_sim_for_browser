@@ -343,7 +343,7 @@ export default class BasicLevel extends Level {
         const currentPitch = euler.x;
         const currentRoll = euler.z;
 
-        const correctivePitch = currentPitch * config.autoLevelPitchGain;
+        const correctivePitch = -currentPitch * config.autoLevelPitchGain;
         finalPitchTorque += correctivePitch;
 
         const correctiveRoll = -currentRoll * config.autoLevelRollGain;
