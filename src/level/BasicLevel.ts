@@ -568,7 +568,21 @@ export default class BasicLevel extends Level {
 
     // cameras
 
-    this.fpvCamera.position.set(dronePos.x, dronePos.y + 0.3, dronePos.z);
+    // Position FPV camera 0.3 units above the drone in its local up direction
+    const localUp = new THREE.Vector3(0, 1, 0);
+    const droneQuaternion = new THREE.Quaternion(
+      droneRot.x,
+      droneRot.y,
+      droneRot.z,
+      droneRot.w,
+    );
+    const worldUp = localUp.clone().applyQuaternion(droneQuaternion);
+    const cameraOffset = worldUp.multiplyScalar(0.3);
+    this.fpvCamera.position.set(
+      dronePos.x + cameraOffset.x,
+      dronePos.y + cameraOffset.y,
+      dronePos.z + cameraOffset.z,
+    );
     this.fpvCamera.quaternion.set(
       droneRot.x,
       droneRot.y,
