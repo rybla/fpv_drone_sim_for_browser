@@ -41,14 +41,13 @@ export async function createLowpolydrone(level: Level): Promise<Drone> {
       .setCcdEnabled(true),
   );
 
-  const _droneCol = level.world.createCollider(
+  const droneCol = level.world.createCollider(
     RAPIER.ColliderDesc.cuboid(0.52, 0.075, 0.52)
       .setMass(config.droneMass)
       .setRestitution(0.2)
       .setFriction(0.5),
     droneBody,
   );
-  void _droneCol;
 
   level.scene.add(droneGroup);
 
@@ -56,5 +55,6 @@ export async function createLowpolydrone(level: Level): Promise<Drone> {
     body: droneBody,
     group: droneGroup,
     propellers: propellers,
+    collider: droneCol,
   };
 }
