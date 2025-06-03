@@ -5,6 +5,7 @@ import { createLowpolydrone } from "../environment/lowpolydrone";
 import { createTU96 } from "../environment/tu95";
 import { createCheckpoint, type Checkpoint } from "../environment/checkpoint";
 import Level from "./Level";
+import { createNanodrone } from "../environment/nanodrone";
 
 export default class BasicLevel extends Level {
   fpvCamera: THREE.PerspectiveCamera;
@@ -217,10 +218,14 @@ export default class BasicLevel extends Level {
   async initialize(): Promise<void> {
     await super.initialize();
     console.log("[BasicLevel.initialize]");
+<<<<<<< Updated upstream
     this.drone = await createLowpolydrone(this);
     const startPos = this.drone.body.translation();
     this.targetPosition.set(startPos.x, 0, startPos.z);
     this.targetAltitude = startPos.y;
+=======
+    this.drone = await createNanodrone(this);
+>>>>>>> Stashed changes
     await createTU96(this, new THREE.Vector3(15, 5, 5));
     this.setupSettingsMenu();
   }
@@ -249,8 +254,16 @@ export default class BasicLevel extends Level {
 
       // Adjust for air density changes caused by temperature
       const standardTempK = 288.15; // 15°C in Kelvin
-      const envTempK = ((this.environmentTemperature - 32) * (5 / 9)) + 273.15;
+      const envTempK = (this.environmentTemperature - 32) * (5 / 9) + 273.15;
       const airDensityFactor = standardTempK / envTempK;
+<<<<<<< Updated upstream
+=======
+      const thrustMagnitude =
+        (this.batteryLevel > 0
+          ? this.controls.throttle * config.maxThrust
+          : 0) * airDensityFactor;
+      const rotation = this.drone!.body.rotation();
+>>>>>>> Stashed changes
 
       const rotation = this.drone!.body.rotation();
       const quaternion = new THREE.Quaternion(
@@ -590,7 +603,10 @@ export default class BasicLevel extends Level {
 
   updateCheckpoints(): void {
     for (const cp of this.checkpoints) {
-      if (!cp.done && this.world.intersectionPair(this.drone!.collider, cp.collider)) {
+      if (
+        !cp.done &&
+        this.world.intersectionPair(this.drone!.collider, cp.collider)
+      ) {
         cp.done = true;
         (cp.mesh.material as THREE.MeshStandardMaterial).color.set(0x00ff00);
       }
