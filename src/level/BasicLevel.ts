@@ -96,6 +96,7 @@ export default class BasicLevel extends Level {
 
   createSkybox() {
     const cubeTextureLoader = new THREE.CubeTextureLoader();
+
     const skybox = cubeTextureLoader
       .setPath("/")
       .load([
@@ -106,6 +107,28 @@ export default class BasicLevel extends Level {
         "nightsky_bk.png",
         "nightsky_ft.png",
       ]);
+
+    // const skybox = cubeTextureLoader
+    //   .setPath("/")
+    //   .load([
+    //     "DaylightSkybox_Right.bmp",
+    //     "DaylightSkybox_Left.bmp",
+    //     "DaylightSkybox_Top.bmp",
+    //     "DaylightSkybox_Down.bmp",
+    //     "DaylightSkybox_Back.bmp",
+    //     "DaylightSkybox_Front.bmp",
+    //   ]);
+
+    // const skybox = cubeTextureLoader
+    //   .setPath("/")
+    //   .load([
+    //     "DaylightSkybox_Right.bmp",
+    //     "DaylightSkybox_Left.bmp",
+    //     "DaylightSkybox_Top.bmp",
+    //     "DaylightSkybox_Down.bmp",
+    //     "DaylightSkybox_Back.bmp",
+    //     "DaylightSkybox_Front.bmp",
+    //   ]);
 
     this.scene.background = skybox; // shows in the backdrop
     this.scene.environment = skybox; // lets reflective materials pick it up

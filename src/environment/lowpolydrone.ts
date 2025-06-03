@@ -49,6 +49,8 @@ export async function createLowpolydrone(level: Level): Promise<Drone> {
     droneBody,
   );
 
+  level.scene.add(droneGroup);
+
   return {
     body: droneBody,
     group: droneGroup,
