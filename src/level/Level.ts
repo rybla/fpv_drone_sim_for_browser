@@ -4,6 +4,7 @@ import * as config from "../config";
 import { createTU96 } from "../environment/tu95";
 import { createCheckpoint, type Checkpoint } from "../environment/checkpoint";
 import { createNanodrone } from "../environment/nanodrone";
+import type { Spec } from "../spec";
 
 export type Controls = {
   throttle: number;
@@ -20,6 +21,8 @@ export type Drone = {
 };
 
 export default class Level {
+  spec: Spec;
+
   world: RAPIER.World;
   renderer: THREE.WebGLRenderer;
   scene: THREE.Scene;
@@ -103,8 +106,10 @@ export default class Level {
     zeta: 4.0, // damping ratio (>1 overdamped)
   };
 
-  constructor() {
+  constructor(spec_: Spec) {
     console.log("[Level.constructor]");
+
+    this.spec = spec_;
 
     this.scene = new THREE.Scene();
 
@@ -176,15 +181,18 @@ export default class Level {
     this.targetWindVector = new THREE.Vector3(0, 0, 0);
     this.windChangeTimer = 0;
     this.windChangeInterval = 8; // seconds between wind target changes
+    this.settings.windEnabled = this.spec.windEnabled;
 
     // temperature
-    this.environmentTemperature = 70; // Starting at 70°F
+    // this.environmentTemperature = 70; // Starting at 70°F
+    this.environmentTemperature = this.spec.environmentTemperature;
     this.targetEnvironmentTemperature = 70;
     this.environmentTemperatureChangeTimer = 0;
     this.environmentTemperatureChangeInterval = 10; // seconds between temperature changes
 
     // ping delay
-    this.pingDelay = Math.random() * 50 + 50; // 50-100ms
+    // this.pingDelay = Math.random() * 50 + 50; // 50-100ms
+    this.pingDelay = this.spec.pingDelay;
     this.inputBuffer = [];
     this.pingChangeTimer = 0;
     this.pingChangeInterval = 3; // change ping every 3 seconds
@@ -194,9 +202,23 @@ export default class Level {
     this.createFloor();
     this.createSkybox();
 
-    // Example checkpoint
+    // TODO: startpoint
+    this.spec.startpoint_locationId;
+
+    // TODO: endpoint
+    this.spec.endpoint_locationId;
+
+    // checkpoints
+    for (const _locationId of this.spec.checkpoint_locationIds) {
+      // TODO: use map of locationId => Vector3
+    }
+
+    // TODO: remove example checkpoint once can do the above thing
     const cp = createCheckpoint(this, new THREE.Vector3(2, 1, -2));
     this.checkpoints.push(cp);
+
+    // TODO: place objects
+    this.spec.objects;
   }
 
   createSkybox() {
@@ -258,13 +280,23 @@ export default class Level {
   }
 
   createLighting() {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    const ambientLight = new THREE.AmbientLight(
+      0xffffff,
+      0.4 * this.spec.lightingLevel,
+    );
     this.scene.add(ambientLight);
 
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+    const hemiLight = new THREE.HemisphereLight(
+      0xffffff,
+      0x444444,
+      0.6 * this.spec.lightingLevel,
+    );
     this.scene.add(hemiLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    const directionalLight = new THREE.DirectionalLight(
+      0xffffff,
+      1.0 * this.spec.lightingLevel,
+    );
     directionalLight.position.set(5, 10, 5);
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = 1024;
@@ -278,11 +310,17 @@ export default class Level {
     this.scene.add(directionalLight);
 
     // Additional point lights to softly illuminate the this.scene
-    const pointLight1 = new THREE.PointLight(0xffffff, 0.6);
+    const pointLight1 = new THREE.PointLight(
+      0xffffff,
+      0.6 * this.spec.lightingLevel,
+    );
     pointLight1.position.set(5, 3, 5);
     this.scene.add(pointLight1);
 
-    const pointLight2 = new THREE.PointLight(0xffffff, 0.6);
+    const pointLight2 = new THREE.PointLight(
+      0xffffff,
+      0.6 * this.spec.lightingLevel,
+    );
     pointLight2.position.set(-5, 3, -5);
     this.scene.add(pointLight2);
   }
