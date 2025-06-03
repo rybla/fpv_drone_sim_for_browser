@@ -1,13 +1,9 @@
-import * as THREE from "three";
-import type RAPIER from "@dimforge/rapier3d-compat";
 import { ColliderDesc } from "@dimforge/rapier3d-compat";
+import * as THREE from "three";
+import type Level from "../level/Level";
 
 // TODO: make `i` actually an arguemnt `pos: THREE.Vector3` that sets the position
-export function createBarrier(
-  scene: THREE.Scene,
-  world: RAPIER.World,
-  i: number,
-) {
+export function createBarrier(level: Level, i: number) {
   const militaryMaterial = new THREE.MeshStandardMaterial({
     color: 0x3a3a2a,
     roughness: 0.9,
@@ -21,8 +17,8 @@ export function createBarrier(
   barrierMesh.castShadow = true;
   barrierMesh.receiveShadow = true;
   barrierMesh.position.set(5 + i * 5, 1, 8);
-  scene.add(barrierMesh);
-  const barrierCol = world.createCollider(
+  level.scene.add(barrierMesh);
+  const barrierCol = level.world.createCollider(
     ColliderDesc.cuboid(2, 1, 0.25).setTranslation(5 + i * 5, 1, 8),
   );
 

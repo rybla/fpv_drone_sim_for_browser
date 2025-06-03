@@ -1,13 +1,9 @@
-import * as THREE from "three";
-import type RAPIER from "@dimforge/rapier3d-compat";
 import { ColliderDesc } from "@dimforge/rapier3d-compat";
+import * as THREE from "three";
+import type Level from "../level/Level";
 
 // TODO: make `pos` actually specify the position correctly
-export function createTank(
-  scene: THREE.Scene,
-  world: RAPIER.World,
-  pos: THREE.Vector3,
-) {
+export function createTank(level: Level, pos: THREE.Vector3) {
   const militaryMaterial = new THREE.MeshStandardMaterial({
     color: 0x3a3a2a,
     roughness: 0.9,
@@ -44,11 +40,11 @@ export function createTank(
 
   tankGroup.position.set(-8, 0, -5);
 
-  const tankCol = world.createCollider(
+  const tankCol = level.world.createCollider(
     ColliderDesc.cuboid(1.5, 0.5, 3).setTranslation(-8, 0.5, -5),
   );
 
-  scene.add(tankGroup);
+  level.scene.add(tankGroup);
 
   return { mesh: tankGroup, collider: tankCol };
 }
