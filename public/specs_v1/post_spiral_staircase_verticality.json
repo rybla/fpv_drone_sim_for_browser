@@ -1,0 +1,29 @@
+{
+    "name": "Grand Library – Spiral Stairway Ascent",
+    "description": "Inspired by the user’s scenario, this level places the drone at the foot of a towering spiral staircase in the mansion’s Grand Library. The flight path winds upward through tight, continuously curving stair flights, with rising air currents and progressively poorer lighting. Obstacles are staged to mirror the narrative: a Metal Barrel blocks the initial entry forcing a hop, unpredictable up-drafts buffet the drone at mid-height, a bulky Portable Fusion Reactor juts into the path three-quarters up, and a Wooden Room Divider creates the last, narrow choke point before the drone finally escapes the stairwell into a quiet attic antechamber. Pilots must thread three sequential checkpoints that mark critical way-points in the vertical climb before reaching the endpoint beyond the divider.",
+    "environmentTemperature": 72,
+    "pingDelay": 80,
+    "windEnabled": true,
+    "lightingLevel": 0.8,
+    "checkpoint_locationIds": [
+        "middle flight of main stairway",
+        "sky light of main stairway",
+        "by stairs of top hallway"
+    ],
+    "startpoint_locationId": "base of stairs of main stairway",
+    "endpoint_locationId": "middle of top boring room",
+    "objects": [
+        {
+            "objectId": "metalBarrel",
+            "locationId": "bottom corner of corner room with stairs"
+        },
+        {
+            "objectId": "portableFusionReactor",
+            "locationId": "top flight of main stairway"
+        },
+        {
+            "objectId": "woodenRoomDivider",
+            "locationId": "doorway of top light room"
+        }
+    ]
+}

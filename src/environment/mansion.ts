@@ -4,6 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 
 export async function createMansion(level: Level, pos: THREE.Vector3) {
+  console.log("create Mansion");
   // Create a group to hold the mansion
   const mansionGroup = new THREE.Group();
   const loader = new GLTFLoader();

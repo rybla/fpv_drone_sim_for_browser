@@ -6,6 +6,21 @@ import { createNanodrone } from "../environment/nanodrone";
 import type { LocationId, ObjectId, Spec } from "../spec";
 import { createMansion } from "../environment/mansion";
 import { createBarrels } from "../environment/barrels";
+import { createCoffeeTable } from "../environment/coffeeTable";
+import { createDynamite } from "../environment/dynamite";
+import { createFan } from "../environment/fan";
+import { createGrenadeCrate } from "../environment/grenadeCrate";
+import { createMarbleTable } from "../environment/marbleTable";
+import { createMedicalKit } from "../environment/medicalKit";
+import { createMetalBarrel } from "../environment/metalBarrel";
+import { createPortableFusionReactor } from "../environment/portableFusionReactor";
+import { createRadio } from "../environment/radio";
+import { createTU96 } from "../environment/tu95";
+import { createWoodenChair } from "../environment/woodenChair";
+import { createWoodenRoomDivider } from "../environment/woodenRoomDivider";
+import { createWoodenTable } from "../environment/woodenTable";
+import { createStartpoint } from "../environment/startpoint";
+import { createEndpoint } from "../environment/endpoint";
 
 export type Controls = {
   throttle: number;
@@ -75,22 +90,19 @@ export const objectCreators: {
   [key in ObjectId]: (level: Level, pos: THREE.Vector3) => Promise<void>;
 } = {
   barrels: createBarrels,
-  barrier: createBarrels,
-  coffeeTable: createBarrels,
-  dynamite: createBarrels,
-  fan: createBarrels,
-  grenadeCrate: createBarrels,
-  mansion: createBarrels,
-  marbleTable: createBarrels,
-  medicalKit: createBarrels,
-  metalBarrel: createBarrels,
-  portableFusionReactor: createBarrels,
-  radio: createBarrels,
-  tank: createBarrels,
-  tu95: createBarrels,
-  woodenChair: createBarrels,
-  woodenRoomDivider: createBarrels,
-  woodenTable: createBarrels,
+  coffeeTable: createCoffeeTable,
+  dynamite: createDynamite,
+  fan: createFan,
+  grenadeCrate: createGrenadeCrate,
+  marbleTable: createMarbleTable,
+  medicalKit: createMedicalKit,
+  metalBarrel: createMetalBarrel,
+  portableFusionReactor: createPortableFusionReactor,
+  radio: createRadio,
+  tu95: createTU96,
+  woodenChair: createWoodenChair,
+  woodenRoomDivider: createWoodenRoomDivider,
+  woodenTable: createWoodenTable,
 };
 
 export default class Level {
@@ -491,13 +503,14 @@ export default class Level {
 
     this.setupSettingsMenu();
 
-    // FROM SPEC: TODO
-    this.spec.startpoint_locationId;
+    // FROM SPEC: startpoint
+    createStartpoint(this, startpointVector);
 
-    // FROM SPEC: TODO
-    this.spec.endpoint_locationId;
+    // FROM SPEC: endpoint
+    const endpointVector = locationVectors[this.spec.endpoint_locationId];
+    createEndpoint(this, endpointVector);
 
-    // FROM SPEC: set create checkpoints
+    // FROM SPEC: checkpoints
     for (const locationId of this.spec.checkpoint_locationIds) {
       this.checkpoints.push(
         createCheckpoint(this, locationVectors[locationId]),

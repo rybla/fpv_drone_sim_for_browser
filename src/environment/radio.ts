@@ -4,6 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 
 export async function createRadio(level: Level, pos: THREE.Vector3) {
+  console.log("create Radio");
   // Create a group to hold the radio
   const radioGroup = new THREE.Group();
   const loader = new GLTFLoader();

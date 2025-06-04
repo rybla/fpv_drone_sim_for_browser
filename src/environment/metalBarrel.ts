@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 export async function createMetalBarrel(level: Level, pos: THREE.Vector3) {
+  console.log("create MetalBarrel");
   // Create a group to hold the metalBarrel
   const metalBarrelGroup = new THREE.Group();
   const loader = new GLTFLoader();

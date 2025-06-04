@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 export async function createDynamite(level: Level, pos: THREE.Vector3) {
+  console.log("create Dynamite");
   // Create a group to hold the dynamite
   const dynamiteGroup = new THREE.Group();
   const loader = new GLTFLoader();

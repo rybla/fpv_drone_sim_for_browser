@@ -6,11 +6,12 @@ export async function createWoodenRoomDivider(
   level: Level,
   pos: THREE.Vector3,
 ) {
+  console.log("create WoodenRoomDivider");
   // Create a group to hold the woodenRoomDivider
   const woodenRoomDividerGroup = new THREE.Group();
   const loader = new GLTFLoader();
   const woodenRoomDividerModel = (
-    await loader.loadAsync("/models/gltf/woodenRoomDivider.gltf")
+    await loader.loadAsync("/models/gltf/roomDivider.gltf")
   ).scene.clone();
   woodenRoomDividerModel.scale.set(4, 4, 4);
   woodenRoomDividerGroup.add(woodenRoomDividerModel);

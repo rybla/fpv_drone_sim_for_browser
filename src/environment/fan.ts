@@ -4,6 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 
 export async function createFan(level: Level, pos: THREE.Vector3) {
+  console.log("create Fan");
   // Create a group to hold the fan
   const fanGroup = new THREE.Group();
   const loader = new GLTFLoader();

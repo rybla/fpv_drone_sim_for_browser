@@ -37,18 +37,15 @@ export type ObjectId = z.infer<typeof ObjectId_Schema>;
 export const ObjectId_Schema = z
   .enum([
     "barrels",
-    "barrier",
     "coffeeTable",
     "dynamite",
     "fan",
     "grenadeCrate",
-    "mansion",
     "marbleTable",
     "medicalKit",
     "metalBarrel",
     "portableFusionReactor",
     "radio",
-    "tank",
     "tu95",
     "woodenChair",
     "woodenRoomDivider",

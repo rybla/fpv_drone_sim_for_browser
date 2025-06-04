@@ -4,6 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 
 export async function createTU96(level: Level, pos: THREE.Vector3) {
+  console.log("create TU96");
   // Create a group to hold the plane
   const planeGroup = new THREE.Group();
 

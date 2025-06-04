@@ -1,0 +1,64 @@
+{
+    "name": "Master Suite IED Scan",
+    "description": "Fly a recon-drone from a bright bathroom, across a glare-causing marble vanity, through a dim master bedroom buffeted by a ceiling fan, and finally into a tight dressing room to scan near an improvised wardrobe. Sudden lighting changes, doorway pinch-points, reflective surfaces, and signal-degrading electronics combine to stress piloting skills while the battery ticks down.",
+    "environmentTemperature": 68,
+    "pingDelay": 90,
+    "windEnabled": false,
+    "lightingLevel": 0.8,
+    "checkpoint_locationIds": [
+        "doorway of top light room",
+        "middle of top boring room"
+    ],
+    "startpoint_locationId": "middle of tile bathroom",
+    "endpoint_locationId": "by tight door of tight doorway room",
+    "objects": [
+        {
+            "objectId": "marbleTable",
+            "locationId": "base of stairs of corner room with stairs"
+        },
+        {
+            "objectId": "fan",
+            "locationId": "sky light of main stairway"
+        },
+        {
+            "objectId": "woodenChair",
+            "locationId": "middle of long bottom room"
+        },
+        {
+            "objectId": "tu95",
+            "locationId": "in corner of checker corner room"
+        },
+        {
+            "objectId": "woodenRoomDivider",
+            "locationId": "back of room of tight doorway room"
+        },
+        {
+            "objectId": "coffeeTable",
+            "locationId": "top flight of main stairway"
+        },
+        {
+            "objectId": "barrels",
+            "locationId": "bottom corner of corner room with stairs"
+        },
+        {
+            "objectId": "radio",
+            "locationId": "facing archway door of small corner room"
+        },
+        {
+            "objectId": "medicalKit",
+            "locationId": "middle of small boring room"
+        },
+        {
+            "objectId": "portableFusionReactor",
+            "locationId": "archway into light and dark room of checker corner room"
+        },
+        {
+            "objectId": "grenadeCrate",
+            "locationId": "base of stairs of main stairway"
+        },
+        {
+            "objectId": "metalBarrel",
+            "locationId": "dark side of light and dark room"
+        }
+    ]
+}

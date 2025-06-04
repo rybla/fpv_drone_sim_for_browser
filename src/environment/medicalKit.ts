@@ -4,6 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 
 export async function createMedicalKit(level: Level, pos: THREE.Vector3) {
+  console.log("create MedicalKit");
   // Create a group to hold the medical kit
   const medicalKitGroup = new THREE.Group();
   const loader = new GLTFLoader();

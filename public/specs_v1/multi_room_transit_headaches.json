@@ -1,0 +1,34 @@
+{
+    "name": "Master Suite IED Scan – Multi-Room Transition",
+    "description": "A tight, three-room drone run that begins in a brightly-lit bathroom, pushes through a doorway into a dimmer bedroom with an operating ceiling fan, and finishes inside a cramped dressing room containing a toy TU-95 model and a wooden chair that guards the hidden device.  Pilots must cope with slick marble reflections, light-to-dark adaptation, fan-generated turbulence, and narrow doorframes while hitting all four progression beacons before reaching the device and reversing course.",
+    "environmentTemperature": 68,
+    "pingDelay": 80,
+    "windEnabled": true,
+    "lightingLevel": 0.9,
+    "checkpoint_locationIds": [
+        "facing archway door of small corner room",
+        "doorway of top light room",
+        "middle of top boring room",
+        "by stairs of top hallway"
+    ],
+    "startpoint_locationId": "middle of tile bathroom",
+    "endpoint_locationId": "by tight door of tight doorway room",
+    "objects": [
+        {
+            "objectId": "marbleTable",
+            "locationId": "in corner of checker corner room"
+        },
+        {
+            "objectId": "fan",
+            "locationId": "corner of top light room"
+        },
+        {
+            "objectId": "tu95",
+            "locationId": "by narrow door room of top hallway"
+        },
+        {
+            "objectId": "woodenChair",
+            "locationId": "back of room of tight doorway room"
+        }
+    ]
+}

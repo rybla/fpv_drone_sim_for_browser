@@ -1,0 +1,80 @@
+{
+    "name": "Spiral Library Climb",
+    "description": "Inspired by the Grand Library’s towering spiral staircase, this level forces the pilot to thread a drone upward through tightening coils and sudden hazards. A Metal Barrel guards the stair entry, three high-output Fans simulate unpredictable updrafts in the narrow core, and a hulking Portable Fusion Reactor pinches the landing at roughly three-quarters height. Near the stair crown, a Wooden Room Divider squeezes the exit path while assorted furniture and crates scattered through adjacent rooms reinforce the sense of a cluttered, historic mansion. Lighting is set a little dimmer than normal to mimic an old-world library ambiance, and light wind is enabled to amplify the fan-driven turbulence. The player launches just outside the stairwell, hits two mandatory mid-stair checkpoints, and finally pops out through the skylight at the very top.",
+    "environmentTemperature": 72,
+    "pingDelay": 60,
+    "windEnabled": true,
+    "lightingLevel": 0.8,
+    "checkpoint_locationIds": [
+        "middle flight of main stairway",
+        "top flight of main stairway"
+    ],
+    "startpoint_locationId": "bottom corner of corner room with stairs",
+    "endpoint_locationId": "sky light of main stairway",
+    "objects": [
+        {
+            "objectId": "metalBarrel",
+            "locationId": "base of stairs of main stairway"
+        },
+        {
+            "objectId": "portableFusionReactor",
+            "locationId": "base of stairs of corner room with stairs"
+        },
+        {
+            "objectId": "woodenRoomDivider",
+            "locationId": "by door of top big light room"
+        },
+        {
+            "objectId": "fan",
+            "locationId": "middle flight of corner room with stairs"
+        },
+        {
+            "objectId": "fan",
+            "locationId": "top of stairs of corner room with stairs"
+        },
+        {
+            "objectId": "fan",
+            "locationId": "archway into light and dark room of checker corner room"
+        },
+        {
+            "objectId": "barrels",
+            "locationId": "corner entrance of long bottom room"
+        },
+        {
+            "objectId": "grenadeCrate",
+            "locationId": "middle of long bottom room"
+        },
+        {
+            "objectId": "woodenTable",
+            "locationId": "middle of small boring room"
+        },
+        {
+            "objectId": "marbleTable",
+            "locationId": "middle of tile bathroom"
+        },
+        {
+            "objectId": "coffeeTable",
+            "locationId": "in corner of checker corner room"
+        },
+        {
+            "objectId": "woodenChair",
+            "locationId": "middle of top boring room"
+        },
+        {
+            "objectId": "radio",
+            "locationId": "middle of hallway of top hallway"
+        },
+        {
+            "objectId": "medicalKit",
+            "locationId": "by tight door of tight doorway room"
+        },
+        {
+            "objectId": "dynamite",
+            "locationId": "back of room of tight doorway room"
+        },
+        {
+            "objectId": "tu95",
+            "locationId": "by window of top big light room"
+        }
+    ]
+}

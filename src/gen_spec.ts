@@ -9,32 +9,6 @@ dotenv.config();
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
-async function example1() {
-  const CalendarEvent = z.object({
-    name: z.string(),
-    date: z.string(),
-    participants: z.array(z.string()),
-  });
-
-  const response = await openai.responses.parse({
-    model: "gpt-4o-2024-08-06",
-    input: [
-      { role: "system", content: "Extract the event information." },
-      {
-        role: "user",
-        content: "Alice and Bob are going to a science fair on Friday.",
-      },
-    ],
-    text: {
-      format: zodTextFormat(CalendarEvent, "event"),
-    },
-  });
-
-  const event = response.output_parsed;
-
-  console.log(event);
-}
-
 async function generate_spec_from_forum_post(post: Post) {
   console.log(`Processing post ${post.id}...`);
 
@@ -60,11 +34,14 @@ ${JSON.stringify(post, null, 4)}
       {
         role: "system",
         content: `
-You are an assistant for designing levels for a new video game where the player flies a drone through an indoor environment (in a mansion). Take into account the user's description of the level in order to produce a structured level specification. Make sure to take into account EVERYTHING that the user wants in the level. Be creative as well! Choose reasonable values for the environmental settings.
+You are an assistant for designing levels for a new video game where the player flies a drone through an indoor environment (in a mansion). Take into account the user's description of the level in order to produce a structured level specification. Make sure to take into account EVERYTHING that the user wants in the level.
 
-You may use any number of copies of each object.
-
-Importantly, note that no two things can be put at the same locationId. Each thing (startpoint, endpoint, checkpoint, ir object) must be placed at a UNIQUE location.
+Keep in mind the following important notes:
+- Create only 1-3 checkpoints.
+- You may use any number of copies of each object. Make sure to place many objects! At least 10 or so.
+- VERY IMPORTANT: no two things can be put at the exact same location. Each thing (startpoint, endpoint, checkpoint, ir object) must be placed at a UNIQUE location.
+- Choose reasonable values for the environmental settings
+- Be creative!
 `.trim(),
       },
       {

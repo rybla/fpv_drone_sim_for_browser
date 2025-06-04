@@ -4,6 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 
 export async function createMarbleTable(level: Level, pos: THREE.Vector3) {
+  console.log("create MarbleTable");
   // Create a group to hold the marble table
   const marbleTableGroup = new THREE.Group();
   const loader = new GLTFLoader();

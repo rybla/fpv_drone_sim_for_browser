@@ -1,0 +1,29 @@
+{
+    "name": "Grand Library – Under-Table Thread-the-Needle",
+    "description": "Inspired by the forum discussion on extreme low-clearance maneuvers, this level recreates a dim main reading room in a mansion-sized library. A gigantic antique wooden table dominates the centre of the space, its thick carved legs creating a tight tunnel that the drone must slip beneath.  The operator starts just outside the reading room doorway, dives low to slide between two legs, and pauses over an old radio (the intel pick-up).  Poor lighting and slow sensor refresh make depth-perception tricky; the lighting level has therefore been dialed down and the ping delay increased.  After the data is collected, the pilot must discover an exit partially blocked by a wooden chair shoved part-way under the table, forcing a delicate sideways crab through a gap only centimetres wider than the quadcopter.  Passing a final checkpoint beyond the chair, the drone then exits to a safe corner immediately outside the room to complete the run.",
+    "environmentTemperature": 68,
+    "pingDelay": 90,
+    "windEnabled": false,
+    "lightingLevel": 0.4,
+    "checkpoint_locationIds": [
+        "corner entrance of long bottom room",
+        "middle of long bottom room",
+        "facing archway door of small corner room"
+    ],
+    "startpoint_locationId": "base of stairs of main stairway",
+    "endpoint_locationId": "bottom corner of corner room with stairs",
+    "objects": [
+        {
+            "objectId": "woodenTable",
+            "locationId": "archway into light and dark room of checker corner room"
+        },
+        {
+            "objectId": "radio",
+            "locationId": "dark side of light and dark room"
+        },
+        {
+            "objectId": "woodenChair",
+            "locationId": "light side of light and dark room"
+        }
+    ]
+}

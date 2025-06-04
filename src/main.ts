@@ -171,9 +171,78 @@ async function main() {
     await level.initialize();
     level.start();
   } else {
-    const response = await fetch(`/specs/archway_chokepoint.json`);
-    const text = await response.text();
-    const spec: Spec = JSON.parse(text);
+    // const response = await fetch(`/specs/archway_chokepoint_post.json`);
+    // // const response = await fetch(`/specs/multi_room_transit_headaches.json`);
+    // // const response = await fetch(`/specs/post_spiral_staircase_verticality.json`);
+    // // const response = await fetch(`/specs/post_table_navigation_issues.json`);
+    // const text = await response.text();
+    // const spec: Spec = JSON.parse(text);
+
+    const spec: Spec = {
+      name: "Wine Cellar Labyrinth – WC-A3 Run",
+      description:
+        "Inspired by forum discussions about the nightmare maneuver through the tight brick archway WC-A3, this level starts the pilot at the cellar entrance, forces them past long rows of racks and through the infamous arch (checkpoint 1), then deeper into a light-starved alcove (checkpoint 2) before finally winding out through another constricted doorway to the hidden back room. Dim lighting, cool cellar air and gusty cross-drafts heighten the difficulty. Barrels and a half-collapsed wooden divider narrow the approach to the arch, while assorted mansion clutter provides plenty of collision hazards elsewhere.",
+      environmentTemperature: 60,
+      pingDelay: 75,
+      windEnabled: true,
+      lightingLevel: 0.4,
+      checkpoint_locationIds: [
+        "archway into light and dark room of checker corner room",
+        "dark side of light and dark room",
+      ],
+      startpoint_locationId: "corner entrance of long bottom room",
+      endpoint_locationId: "middle of long bottom room",
+      objects: [
+        {
+          objectId: "barrels",
+          locationId: "facing archway door of small corner room",
+        },
+        {
+          objectId: "barrels",
+          locationId: "bottom corner of corner room with stairs",
+        },
+        {
+          objectId: "woodenRoomDivider",
+          locationId: "in corner of checker corner room",
+        },
+        {
+          objectId: "metalBarrel",
+          locationId: "middle of long bottom room",
+        },
+        {
+          objectId: "fan",
+          locationId: "corner of top light room",
+        },
+        {
+          objectId: "portableFusionReactor",
+          locationId: "sky light of main stairway",
+        },
+        {
+          objectId: "radio",
+          locationId: "middle of small boring room",
+        },
+        {
+          objectId: "woodenTable",
+          locationId: "middle of tile bathroom",
+        },
+        {
+          objectId: "coffeeTable",
+          locationId: "doorway of top light room",
+        },
+        {
+          objectId: "woodenChair",
+          locationId: "by stairs of top hallway",
+        },
+        {
+          objectId: "grenadeCrate",
+          locationId: "middle flight of main stairway",
+        },
+        {
+          objectId: "medicalKit",
+          locationId: "by narrow door room of top hallway",
+        },
+      ],
+    };
 
     const level = new Level(spec);
     await level.initialize();

@@ -6,6 +6,7 @@ import RAPIER from "@dimforge/rapier3d-compat";
 import * as config from "../config";
 
 export async function createLowpolydrone(level: Level): Promise<Drone> {
+  console.log("create Lowpolydrone");
   const droneGroup = new THREE.Group();
 
   console.log("Creating lowpoly drone");

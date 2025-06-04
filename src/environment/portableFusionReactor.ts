@@ -6,6 +6,7 @@ export async function createPortableFusionReactor(
   level: Level,
   pos: THREE.Vector3,
 ) {
+  console.log("create PortableFusionReactor");
   // Create a group to hold the portableFusionReactor
   const portableFusionReactorGroup = new THREE.Group();
   const loader = new GLTFLoader();

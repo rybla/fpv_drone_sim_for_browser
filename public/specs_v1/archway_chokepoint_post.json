@@ -1,0 +1,27 @@
+{
+    "name": "Wine Cellar Labyrinth – Archway Chokepoint (WC-A3)",
+    "description": "This compact level recreates the infamous WC-A3 brick archway inside the mansion’s subterranean wine cellar.  The player launches in the center of a long, musty aisle between tall wine racks, then threads the drone through the ultra-narrow brick archway that leads into a cramped checker-tiled storage chamber.  Two large barrels lean against the arch, a half-collapsed wooden room divider protrudes just beyond, and an industrial fan hidden deeper in the tight corridor sporadically kicks up gusts, simulating the cellar’s fickle drafts.  Lighting is intentionally dim and yellow-tinted to evoke a lantern-lit cellar, so sensor reliance is critical.  A single checkpoint located immediately after the archway confirms clean passage before the pilot pushes on to the shadowy alcove that marks the mission’s end.  Touching any obstacle or the arch walls triggers a mission failure, emphasizing extreme precision and micro-adjustments.",
+    "environmentTemperature": 60,
+    "pingDelay": 90,
+    "windEnabled": true,
+    "lightingLevel": 0.4,
+    "checkpoint_locationIds": [
+        "in corner of checker corner room"
+    ],
+    "startpoint_locationId": "middle of long bottom room",
+    "endpoint_locationId": "dark side of light and dark room",
+    "objects": [
+        {
+            "objectId": "barrels",
+            "locationId": "archway into light and dark room of checker corner room"
+        },
+        {
+            "objectId": "woodenRoomDivider",
+            "locationId": "by tight door of tight doorway room"
+        },
+        {
+            "objectId": "fan",
+            "locationId": "back of room of tight doorway room"
+        }
+    ]
+}

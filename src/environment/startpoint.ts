@@ -14,7 +14,7 @@ export function createStartpoint(
   radius = 0.25,
 ): Startpoint {
   const geometry = new THREE.SphereGeometry(radius, 16, 16);
-  const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+  const material = new THREE.MeshStandardMaterial({ color: 0x00ffff });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.castShadow = true;
   mesh.position.copy(position);

@@ -4,6 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 
 export async function createCoffeeTable(level: Level, pos: THREE.Vector3) {
+  console.log("create CoffeeTable");
   // Create a group to hold the coffee table
   const coffeeTableGroup = new THREE.Group();
   const loader = new GLTFLoader();

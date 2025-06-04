@@ -4,6 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type Level from "../level/Level";
 
 export async function createWoodenTable(level: Level, pos: THREE.Vector3) {
+  console.log("create WoodenTable");
   // Create a group to hold the wooden table
   const woodenTableGroup = new THREE.Group();
   const loader = new GLTFLoader();
