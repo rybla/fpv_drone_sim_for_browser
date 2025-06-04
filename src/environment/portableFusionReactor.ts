@@ -13,7 +13,7 @@ export async function createPortableFusionReactor(
   const portableFusionReactorModel = (
     await loader.loadAsync("/models/gltf/portableFusionReactor.gltf")
   ).scene.clone();
-  portableFusionReactorModel.scale.set(4, 4, 4);
+  portableFusionReactorModel.scale.set(1.5, 1.5, 1.5);
   portableFusionReactorGroup.add(portableFusionReactorModel);
   // Enable shadows for all meshes in the model
   portableFusionReactorGroup.traverse((child: THREE.Object3D) => {

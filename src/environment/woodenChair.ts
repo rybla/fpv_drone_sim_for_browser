@@ -11,7 +11,7 @@ export async function createWoodenChair(level: Level, pos: THREE.Vector3) {
   const woodenChairModel = (
     await loader.loadAsync("/models/gltf/woodenChair.gltf")
   ).scene.clone();
-  woodenChairModel.scale.set(4, 4, 4);
+  woodenChairModel.scale.set(0.3, 0.3, 0.3);
   woodenChairGroup.add(woodenChairModel);
 
   // Enable shadows for all meshes in the model

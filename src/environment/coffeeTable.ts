@@ -11,7 +11,7 @@ export async function createCoffeeTable(level: Level, pos: THREE.Vector3) {
   const coffeeTableModel = (
     await loader.loadAsync("/models/gltf/coffeeTable.gltf")
   ).scene.clone();
-  coffeeTableModel.scale.set(4, 4, 4);
+  coffeeTableModel.scale.set(20, 20, 20);
   coffeeTableGroup.add(coffeeTableModel);
 
   // Enable shadows for all meshes in the model

@@ -11,7 +11,7 @@ export async function createWoodenTable(level: Level, pos: THREE.Vector3) {
   const woodenTableModel = (
     await loader.loadAsync("/models/gltf/woodenTable.gltf")
   ).scene.clone();
-  woodenTableModel.scale.set(4, 4, 4);
+  woodenTableModel.scale.set(8, 8, 8);
   woodenTableGroup.add(woodenTableModel);
 
   // Enable shadows for all meshes in the model

@@ -10,7 +10,7 @@ export async function createDynamite(level: Level, pos: THREE.Vector3) {
   const dynamiteModel = (
     await loader.loadAsync("/models/gltf/dynamite.gltf")
   ).scene.clone();
-  dynamiteModel.scale.set(4, 4, 4);
+  dynamiteModel.scale.set(10, 10, 10);
   dynamiteGroup.add(dynamiteModel);
   // Enable shadows for all meshes in the model
   dynamiteGroup.traverse((child: THREE.Object3D) => {

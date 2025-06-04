@@ -11,7 +11,7 @@ export async function createRadio(level: Level, pos: THREE.Vector3) {
   const radioModel = (
     await loader.loadAsync("/models/gltf/radio.gltf")
   ).scene.clone();
-  radioModel.scale.set(4, 4, 4);
+  radioModel.scale.set(2, 2, 2);
   radioGroup.add(radioModel);
 
   // Enable shadows for all meshes in the model

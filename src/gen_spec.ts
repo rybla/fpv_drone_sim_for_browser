@@ -1,10 +1,9 @@
+import * as dotenv from "dotenv";
+import * as fs from "fs/promises";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
-import { z } from "zod";
-import * as dotenv from "dotenv";
-import { Spec_Schema } from "./spec";
 import type { Post } from "./gen_common";
-import * as fs from "fs/promises";
+import { Spec_Schema } from "./spec";
 dotenv.config();
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -39,7 +38,7 @@ You are an assistant for designing levels for a new video game where the player 
 Keep in mind the following important notes:
 - Create only 1-3 checkpoints.
 - You may use any number of copies of each object. Make sure to place many objects! At least 10 or so.
-- VERY IMPORTANT: no two things can be put at the exact same location. Each thing (startpoint, endpoint, checkpoint, ir object) must be placed at a UNIQUE location.
+- VERY IMPORTANT: no two things can be put at the exact same location. Each thing (startpoint, endpoint, checkpoint, ir object) must be placed at a UNIQUE location. But still, the same room can have multiple things in it.
 - Choose reasonable values for the environmental settings
 - Be creative!
 `.trim(),

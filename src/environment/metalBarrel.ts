@@ -10,7 +10,7 @@ export async function createMetalBarrel(level: Level, pos: THREE.Vector3) {
   const metalBarrelModel = (
     await loader.loadAsync("/models/gltf/metalBarrel.gltf")
   ).scene.clone();
-  metalBarrelModel.scale.set(4, 4, 4);
+  metalBarrelModel.scale.set(0.015, 0.015, 0.015);
   metalBarrelGroup.add(metalBarrelModel);
   // Enable shadows for all meshes in the model
   metalBarrelGroup.traverse((child: THREE.Object3D) => {

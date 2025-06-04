@@ -11,7 +11,7 @@ export async function createMedicalKit(level: Level, pos: THREE.Vector3) {
   const medicalKitModel = (
     await loader.loadAsync("/models/gltf/medicalKit.gltf")
   ).scene.clone();
-  medicalKitModel.scale.set(4, 4, 4);
+  medicalKitModel.scale.set(0.3, 0.3, 0.3);
   medicalKitGroup.add(medicalKitModel);
 
   // Enable shadows for all meshes in the model

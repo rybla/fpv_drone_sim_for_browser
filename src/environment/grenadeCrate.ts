@@ -10,7 +10,8 @@ export async function createGrenadeCrate(level: Level, pos: THREE.Vector3) {
   const grenadeCrateModel = (
     await loader.loadAsync("/models/gltf/grenadeCrate.gltf")
   ).scene.clone();
-  grenadeCrateModel.scale.set(4, 4, 4);
+  // grenadeCrateModel.scale.set(4, 4, 4);
+  grenadeCrateModel.scale.set(0.05, 0.05, 0.05);
   grenadeCrateGroup.add(grenadeCrateModel);
   // Enable shadows for all meshes in the model
   grenadeCrateGroup.traverse((child: THREE.Object3D) => {

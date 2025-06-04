@@ -11,7 +11,7 @@ export async function createFan(level: Level, pos: THREE.Vector3) {
   const fanModel = (
     await loader.loadAsync("/models/gltf/fan.gltf")
   ).scene.clone();
-  fanModel.scale.set(4, 4, 4);
+  fanModel.scale.set(0.01, 0.01, 0.01);
   fanGroup.add(fanModel);
 
   // Enable shadows for all meshes in the model

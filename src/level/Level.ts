@@ -1,26 +1,22 @@
 import RAPIER from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
 import * as config from "../config";
-import { createCheckpoint, type Checkpoint } from "../environment/checkpoint";
-import { createNanodrone } from "../environment/nanodrone";
-import type { LocationId, ObjectId, Spec } from "../spec";
-import { createMansion } from "../environment/mansion";
 import { createBarrels } from "../environment/barrels";
+import { createCheckpoint, type Checkpoint } from "../environment/checkpoint";
 import { createCoffeeTable } from "../environment/coffeeTable";
-import { createDynamite } from "../environment/dynamite";
+import { createEndpoint } from "../environment/endpoint";
 import { createFan } from "../environment/fan";
 import { createGrenadeCrate } from "../environment/grenadeCrate";
 import { createMarbleTable } from "../environment/marbleTable";
 import { createMedicalKit } from "../environment/medicalKit";
 import { createMetalBarrel } from "../environment/metalBarrel";
-import { createPortableFusionReactor } from "../environment/portableFusionReactor";
-import { createRadio } from "../environment/radio";
+import { createNanodrone } from "../environment/nanodrone";
+import { createStartpoint } from "../environment/startpoint";
 import { createTU96 } from "../environment/tu95";
 import { createWoodenChair } from "../environment/woodenChair";
 import { createWoodenRoomDivider } from "../environment/woodenRoomDivider";
 import { createWoodenTable } from "../environment/woodenTable";
-import { createStartpoint } from "../environment/startpoint";
-import { createEndpoint } from "../environment/endpoint";
+import type { LocationId, ObjectId, Spec } from "../spec";
 
 export type Controls = {
   throttle: number;
@@ -54,7 +50,7 @@ export const locationVectors: { [key in LocationId]: THREE.Vector3 } = {
     -3.4,
   ),
   "corner entrance of long bottom room": new THREE.Vector3(26.6, 1.0, -6.7),
-  "middle of long bottom room": new THREE.Vector3(35.8, 7.2, -15.3),
+  "middle of long bottom room": new THREE.Vector3(35.8, 5.2, -15.3),
   "facing archway door of small corner room": new THREE.Vector3(
     74.7,
     3.7,
@@ -91,14 +87,11 @@ export const objectCreators: {
 } = {
   barrels: createBarrels,
   coffeeTable: createCoffeeTable,
-  dynamite: createDynamite,
   fan: createFan,
   grenadeCrate: createGrenadeCrate,
   marbleTable: createMarbleTable,
   medicalKit: createMedicalKit,
   metalBarrel: createMetalBarrel,
-  portableFusionReactor: createPortableFusionReactor,
-  radio: createRadio,
   tu95: createTU96,
   woodenChair: createWoodenChair,
   woodenRoomDivider: createWoodenRoomDivider,
@@ -499,7 +492,8 @@ export default class Level {
     this.targetPosition.set(startPos.x, 0, startPos.z);
     this.targetAltitude = startPos.y;
 
-    await createMansion(this, new THREE.Vector3(1, 0.2, 1));
+    // TODO: re-enable this after testing
+    // await createMansion(this, new THREE.Vector3(1, 0.2, 1));
 
     this.setupSettingsMenu();
 

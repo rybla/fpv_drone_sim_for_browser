@@ -13,7 +13,7 @@ export async function createWoodenRoomDivider(
   const woodenRoomDividerModel = (
     await loader.loadAsync("/models/gltf/roomDivider.gltf")
   ).scene.clone();
-  woodenRoomDividerModel.scale.set(4, 4, 4);
+  woodenRoomDividerModel.scale.set(3, 3, 3);
   woodenRoomDividerGroup.add(woodenRoomDividerModel);
   // Enable shadows for all meshes in the model
   woodenRoomDividerGroup.traverse((child: THREE.Object3D) => {
