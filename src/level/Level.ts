@@ -56,8 +56,6 @@ export default class Level {
   windChangeTimer: number;
   windChangeInterval: number;
 
-  initialPingDelay: number;
-  pingDelayRange: number;
   pingDelay: number; // milliseconds
   inputBuffer: Array<{
     timestamp: number;
@@ -194,9 +192,7 @@ export default class Level {
 
     // ping delay
     // this.pingDelay = Math.random() * 50 + 50; // 50-100ms
-    this.initialPingDelay = this.spec.pingDelay;
-    this.pingDelay = this.initialPingDelay;
-    this.pingDelayRange = 20;
+    this.pingDelay = this.spec.pingDelay;
     this.inputBuffer = [];
     this.pingChangeTimer = 0;
     this.pingChangeInterval = 3; // change ping every 3 seconds
@@ -533,8 +529,13 @@ export default class Level {
       const autoLevelFactor = this.settings.autoLevelEnabled
         ? this.settings.autoLevelStrength
         : 0;
-      const effectiveDesiredPitch = desiredPitch * (1 - autoLevelFactor * 0.5);
-      const effectiveDesiredRoll = desiredRoll * (1 - autoLevelFactor * 0.5);
+      const effectiveDesiredPitch = desiredPitch;
+      const effectiveDesiredRoll = desiredRoll;
+
+      // Calculate stabilization in body frame to avoid yaw coupling
+      const bodyAngVel = new THREE.Vector3(angVel.x, angVel.y, angVel.z);
+      const invQuat = quaternion.clone().conjugate();
+      bodyAngVel.applyQuaternion(invQuat);
 
       const effectivePitchError = effectiveDesiredPitch - euler.x;
       const effectiveRollError = effectiveDesiredRoll - euler.z;
@@ -542,26 +543,31 @@ export default class Level {
       const angleKp = 80.0 * gainMultiplier * (1 + autoLevelFactor);
       const angleKd = 20.0 * gainMultiplier * (1 + autoLevelFactor * 0.5);
 
+      // Apply corrections in body frame
       let finalPitchTorque =
         THREE.MathUtils.clamp(
-          angleKp * effectivePitchError - angleKd * angVel.x,
+          angleKp * effectivePitchError - angleKd * bodyAngVel.x,
           -1,
           1,
-        ) * config.maxPitchTorque;
+        ) *
+        config.maxPitchTorque *
+        2;
       let finalRollTorque =
         THREE.MathUtils.clamp(
-          angleKp * effectiveRollError - angleKd * angVel.z,
+          angleKp * effectiveRollError - angleKd * bodyAngVel.z,
           -1,
           1,
-        ) * config.maxRollTorque;
+        ) *
+        config.maxRollTorque *
+        2;
       let finalYawTorque =
-        -this.controls.yaw *
+        (-this.controls.yaw *
           config.maxYawTorque *
           this.settings.yawSensitivity -
-        angVel.y * 0.002;
+          angVel.y * (Math.abs(this.controls.yaw) < 0.1 ? 0.2 : 0.002)) *
+        2;
 
       const worldUp = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion);
-
       const altitude = this.drone!.body.translation().y;
       const vertVel = this.drone!.body.linvel().y;
       const altError = this.targetAltitude - altitude;
@@ -582,9 +588,9 @@ export default class Level {
       }
 
       const thrustVector = {
-        x: worldUp.x * thrustMagnitude,
-        y: worldUp.y * thrustMagnitude,
-        z: worldUp.z * thrustMagnitude,
+        x: worldUp.x * thrustMagnitude * 2,
+        y: worldUp.y * thrustMagnitude * 2,
+        z: worldUp.z * thrustMagnitude * 2,
       };
       this.drone!.body.addForce(thrustVector, true);
 
@@ -748,7 +754,7 @@ export default class Level {
       deltaTime;
 
     // Update target altitude based on throttle input
-    const altitudeRate = 2.0; // m/s per throttle unit
+    const altitudeRate = 5.0; // m/s per throttle unit
     if (this.controls.throttle > 0.1) {
       this.targetAltitude +=
         (this.controls.throttle - config.hoverThrottle) *
@@ -823,8 +829,7 @@ export default class Level {
 
     if (this.pingChangeTimer >= this.pingChangeInterval) {
       // Generate new ping value between 50-100ms
-      this.pingDelay =
-        Math.random() * this.pingDelayRange + this.initialPingDelay;
+      this.pingDelay = Math.random() * 50 + 50;
       this.pingChangeTimer = 0;
     }
   }
@@ -889,12 +894,12 @@ export default class Level {
     document.getElementById("roll")!.textContent = `${roll.toFixed(1)}°`;
     document.getElementById("yaw")!.textContent = `${yaw.toFixed(1)}°`;
     document.getElementById("velocity")!.textContent =
-      `${totalVelocity.toFixed(1)} m/s`;
+      `${(totalVelocity * 0.25).toFixed(1)} m/s`;
     document.getElementById("groundspeed")!.textContent =
-      `${groundSpeed.toFixed(1)} m/s`;
+      `${(groundSpeed * 0.25).toFixed(1)} m/s`;
     const altitude = this.drone!.body.translation().y;
     document.getElementById("altitude")!.textContent =
-      `${altitude.toFixed(1)} m`;
+      `${(altitude * 0.25).toFixed(1)} m`;
 
     // Wind
     const windSpeed = Math.sqrt(
@@ -911,7 +916,7 @@ export default class Level {
       `${Math.round(this.pingDelay)} ms`;
 
     document.getElementById("windspeed")!.textContent =
-      `${windSpeed.toFixed(1)} m/s`;
+      `${(windSpeed * 0.25).toFixed(1)} m/s`;
     document.getElementById("winddir")!.textContent =
       `${normalizedWindDir.toFixed(0)}°`;
 

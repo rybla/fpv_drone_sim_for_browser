@@ -10,6 +10,7 @@ export async function createMansion(level: Level, pos: THREE.Vector3) {
   const mansionModel = (
     await loader.loadAsync("/models/gltf/mansion.gltf")
   ).scene.clone();
+
   mansionModel.scale.set(4, 4, 4);
   mansionGroup.add(mansionModel);
 
@@ -50,19 +51,20 @@ export async function createMansion(level: Level, pos: THREE.Vector3) {
       if (clonedGeometry.index) {
         indices = new Uint32Array(clonedGeometry.index.array);
       } else {
-        // Create indices for non-indexed geometry
+        // Create proper triangle indices for non-indexed geometry
         const vertexCount = vertices.length / 3;
+        const triangleCount = vertexCount / 3;
         indices = new Uint32Array(vertexCount);
-        for (let i = 0; i < vertexCount; i++) {
-          indices[i] = i;
+        for (let i = 0; i < triangleCount; i++) {
+          const baseIndex = i * 3;
+          indices[baseIndex] = baseIndex;
+          indices[baseIndex + 1] = baseIndex + 1;
+          indices[baseIndex + 2] = baseIndex + 2;
         }
       }
 
-      // Create trimesh collider for static environment
-      const trimeshDesc = ColliderDesc.trimesh(
-        vertices,
-        indices,
-      ).setTranslation(pos.x, pos.y, pos.z);
+      // Create trimesh collider - DON'T set translation since it's already in the vertices
+      const trimeshDesc = ColliderDesc.trimesh(vertices, indices);
 
       // Create the collider
       level.world.createCollider(trimeshDesc);
