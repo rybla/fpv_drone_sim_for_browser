@@ -124,6 +124,9 @@
                             <label>Infinite Battery</label>
                             <input type="checkbox" id="infinite-battery-toggle" />
                             <span></span>
+                            <label>Show Coordinates</label>
+                            <input type="checkbox" id="coordinates-toggle" />
+                            <span></span>
                         </div>
                         <button id="reset-defaults">RESET TO DEFAULTS</button>
                         <button id="settings-back">BACK</button>
@@ -175,6 +178,10 @@
             <div class="hud-item">
                 <span class="hud-label">TEMP</span>
                 <span class="hud-value" id="temperature">70°F</span>
+            </div>
+            <div class="hud-item" id="coordinates-display" style="display: none">
+                <span class="hud-label">POSITION</span>
+                <span class="hud-value" id="coordinates">X: 0.0 Y: 0.0 Z: 0.0</span>
             </div>
             <div class="motor-thrust">
                 <div class="motor-label">MOTOR CONTROL</div>

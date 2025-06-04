@@ -96,6 +96,7 @@ export default class Level {
     autoLevelEnabled: true,
     batteryDrainMultiplier: 1.0,
     infiniteBattery: false,
+    showCoordinates: false,
   };
 
   lateralTuning = {
@@ -924,6 +925,16 @@ export default class Level {
     document.getElementById("temperature")!.textContent =
       `${Math.round(this.environmentTemperature)}°F`;
 
+    // Coordinates
+    if (this.settings.showCoordinates) {
+      const pos = this.drone!.body.translation();
+      document.getElementById("coordinates")!.textContent =
+        `X: ${pos.x.toFixed(1)} Y: ${pos.y.toFixed(1)} Z: ${pos.z.toFixed(1)}`;
+      document.getElementById("coordinates-display")!.style.display = "block";
+    } else {
+      document.getElementById("coordinates-display")!.style.display = "none";
+    }
+
     // Update motor thrust bars
     // Calculate motor speeds based on control inputs (same mixing as propellers)
     const base = this.controls.throttle;
@@ -1086,6 +1097,14 @@ export default class Level {
       this.settings.infiniteBattery = infiniteBatteryToggle.checked;
     });
 
+    // Show Coordinates
+    const coordinatesToggle = document.getElementById(
+      "coordinates-toggle",
+    ) as HTMLInputElement;
+    coordinatesToggle?.addEventListener("change", () => {
+      this.settings.showCoordinates = coordinatesToggle.checked;
+    });
+
     // Reset to defaults
     const resetButton = document.getElementById("reset-defaults");
     resetButton?.addEventListener("click", () => {
@@ -1103,6 +1122,7 @@ export default class Level {
         autoLevelEnabled: true,
         batteryDrainMultiplier: 1.0,
         infiniteBattery: false,
+        showCoordinates: false,
       };
 
       // Update all UI elements
@@ -1131,6 +1151,9 @@ export default class Level {
       document.getElementById("battery-drain-value")!.textContent = "1.0x";
       (
         document.getElementById("infinite-battery-toggle") as HTMLInputElement
+      ).checked = false;
+      (
+        document.getElementById("coordinates-toggle") as HTMLInputElement
       ).checked = false;
 
       // Apply settings
