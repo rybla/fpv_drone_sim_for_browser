@@ -1,0 +1,50 @@
+{
+    "name": "Frostbite Passage",
+    "description": "A dimly lit, draft-ridden winter scenario set across two adjoining rooms.  Sparse lamps and the glow of a TV are the only light sources, forcing players to rely on the flashlight found early in the route.  A cold current sneaks in through the cracked window in Room B and is amplified by a fan, creating occasional turbulence that nudges the drone off course.  The course begins in total darkness beneath a table, climbs onto the tabletop strewn with a toy airplane, dives through a glowing obstacle ring in the doorway, and weaves past a sofa before finishing at the icy window ledge.  Snow can be seen swirling outside, and faint howling wind audio reinforces the frigid, low-light atmosphere.",
+    "environmentTemperature": 28,
+    "pingDelay": 850,
+    "windEnabled": true,
+    "lightingLevel": 0.2,
+    "checkpoint_locationIds": [
+        "on top of the table in room A",
+        "in the doorway between rooms A and B",
+        "near the wall of room B",
+        "in the middle of room B"
+    ],
+    "startpoint_locationId": "under the table in room A",
+    "endpoint_locationId": "by the window in room B",
+    "objects": [
+        {
+            "objectId": "lamp",
+            "locationId": "in the middle of room A"
+        },
+        {
+            "objectId": "flashlight",
+            "locationId": "under the table in room A"
+        },
+        {
+            "objectId": "airplane",
+            "locationId": "on top of the table in room A"
+        },
+        {
+            "objectId": "obstacle course ring",
+            "locationId": "in the doorway between rooms A and B"
+        },
+        {
+            "objectId": "TV",
+            "locationId": "in the middle of room B"
+        },
+        {
+            "objectId": "sofa",
+            "locationId": "near the wall of room B"
+        },
+        {
+            "objectId": "fan",
+            "locationId": "by the window in room B"
+        },
+        {
+            "objectId": "ball",
+            "locationId": "in the middle of room A"
+        }
+    ]
+}
