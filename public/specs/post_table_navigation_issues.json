@@ -1,71 +1,56 @@
 {
-    "name": "Grand Library Under-Table Retrieval",
-    "description": "Inspired by the forum discussion on extreme close-quarters flight, this level puts the pilot in the Grand Library.  The route begins at the base of the main stairway, forces the drone up one flight to build confidence, then pushes it down a corridor into the dim Grand Library where an antique wooden reading table dominates the dark half of the light-and-dark chamber.  The operator must slip beneath that table, pass a fragile tube-radio sitting on the floor, and recover the intel marker located in the archway just beyond.  A single checkpoint on the stairway lets pilots reset before attempting the precision portion.  Numerous props—barrels, furniture, a whirring fan that stirs up dust, even a dangerously stored grenade crate—create believable clutter and subtle airflow disturbances throughout the mansion.",
+    "name": "Grand Library Under-Table Skim",
+    "description": "Inspired by the forum’s \"Grand Library\" discussion, this level recreates a dim, wood-paneled reading room dominated by an enormous antique wooden table.  The drone begins at the mansion’s main stairway, threads through ground-floor halls, then drops under the table to collect intel before escaping through a partially blocked exit.  Tight leg spacing, poor light, and a \"radio\" (represented by a floor fan) beside one table leg force ultra-precise manoeuvres.  Extra furniture, crates, and décor scattered throughout the mansion add optional slalom challenges while ensuring the environment feels lived-in and cluttered, and overhead turbulence (windEnabled) simulates down-wash in confined air.  The player must touch two checkpoints on the way to the objective under the table, then reach the far corner of the checker room to exfiltrate.",
     "environmentTemperature": 68,
-    "pingDelay": 80,
-    "windEnabled": false,
+    "pingDelay": 90,
+    "windEnabled": true,
     "lightingLevel": 0.4,
     "checkpoint_locationIds": [
-        "middle flight of main stairway"
+        "corner entrance of long bottom room",
+        "middle of hallway of top hallway"
     ],
     "startpoint_locationId": "base of stairs of main stairway",
-    "endpoint_locationId": "archway into light and dark room of checker corner room",
+    "endpoint_locationId": "in corner of checker corner room",
     "objects": [
         {
             "objectId": "woodenTable",
-            "locationId": "dark side of light and dark room"
-        },
-        {
-            "objectId": "radio",
-            "locationId": "light side of light and dark room"
-        },
-        {
-            "objectId": "woodenChair",
-            "locationId": "in corner of checker corner room"
-        },
-        {
-            "objectId": "fan",
-            "locationId": "corner of top light room"
-        },
-        {
-            "objectId": "barrels",
-            "locationId": "bottom corner of corner room with stairs"
-        },
-        {
-            "objectId": "metalBarrel",
-            "locationId": "base of stairs of corner room with stairs"
-        },
-        {
-            "objectId": "coffeeTable",
-            "locationId": "middle of small boring room"
-        },
-        {
-            "objectId": "woodenRoomDivider",
             "locationId": "middle of top boring room"
         },
         {
-            "objectId": "medicalKit",
-            "locationId": "middle of tile bathroom"
+            "objectId": "woodenTable",
+            "locationId": "middle of top boring room"
         },
         {
-            "objectId": "portableFusionReactor",
-            "locationId": "back of room of tight doorway room"
+            "objectId": "woodenTable",
+            "locationId": "middle of top boring room"
         },
         {
-            "objectId": "grenadeCrate",
-            "locationId": "by tight door of tight doorway room"
+            "objectId": "woodenTable",
+            "locationId": "middle of top boring room"
         },
         {
-            "objectId": "marbleTable",
-            "locationId": "by window of top big light room"
+            "objectId": "woodenTable",
+            "locationId": "middle of top boring room"
         },
         {
-            "objectId": "dynamite",
-            "locationId": "sky light of main stairway"
+            "objectId": "woodenTable",
+            "locationId": "middle of top boring room"
         },
         {
-            "objectId": "tu95",
-            "locationId": "top flight of main stairway"
+            "objectId": "woodenTable",
+            "locationId": "middle of top boring room"
+        },
+        {
+            "objectId": "woodenTable",
+            "locationId": "middle of top boring room"
+        },
+        {
+            "objectId": "woodenTable",
+            "locationId": "middle of top boring room"
+        },
+        {
+            "objectId": "woodenTable",
+            "locationId": "middle of top boring room"
         }
     ]
 }

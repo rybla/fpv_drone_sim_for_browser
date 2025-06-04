@@ -166,7 +166,7 @@ const example_spec: Spec = {
 async function main() {
   await RAPIER.init();
 
-  if (true) {
+  if (false) {
     const level = new Level(example_spec);
     await level.initialize();
     level.start();
@@ -175,8 +175,8 @@ async function main() {
     // const response = await fetch(`/specs/multi_room_transit_headaches.json`);
     // const response = await fetch(`/specs/post_spiral_staircase_verticality.json`);
     // const response = await fetch(`/specs/post_table_navigation_issues.json`);
-    // const text = await response.text();
-    // const spec: Spec = JSON.parse(text);
+    const text = await response.text();
+    const spec: Spec = JSON.parse(text);
 
     // const spec: Spec = {
     //   name: "Wine Cellar Labyrinth – WC-A3 Run",
@@ -197,9 +197,9 @@ async function main() {
     //   ],
     // };
 
-    // const level = new Level(spec);
-    // await level.initialize();
-    // level.start();
+    const level = new Level(spec);
+    await level.initialize();
+    level.start();
   }
 }
 

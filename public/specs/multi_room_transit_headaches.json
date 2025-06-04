@@ -1,64 +1,56 @@
 {
     "name": "Master Suite IED Scan",
-    "description": "Fly a recon-drone from a bright bathroom, across a glare-causing marble vanity, through a dim master bedroom buffeted by a ceiling fan, and finally into a tight dressing room to scan near an improvised wardrobe. Sudden lighting changes, doorway pinch-points, reflective surfaces, and signal-degrading electronics combine to stress piloting skills while the battery ticks down.",
-    "environmentTemperature": 68,
-    "pingDelay": 90,
+    "description": "Pilot a micro-UAV from an over-exposed bathroom through a dim bedroom and into a cluttered dressing room to locate a simulated IED, then exfiltrate.  Lighting shifts, a reflective marble table, an active ceiling fan, and densely packed furniture reproduce the orientation, sensor, and control problems called out in the forum discussion.  Checkpoints force the operator to steady up in the bedroom before squeezing past the final doorway into the dressing room where the target sits.",
+    "environmentTemperature": 72,
+    "pingDelay": 120,
     "windEnabled": false,
-    "lightingLevel": 0.8,
+    "lightingLevel": 0.85,
     "checkpoint_locationIds": [
-        "doorway of top light room",
-        "middle of top boring room"
+        "middle of top boring room",
+        "by door of top big light room"
     ],
     "startpoint_locationId": "middle of tile bathroom",
-    "endpoint_locationId": "by tight door of tight doorway room",
+    "endpoint_locationId": "back of room of tight doorway room",
     "objects": [
         {
             "objectId": "marbleTable",
-            "locationId": "base of stairs of corner room with stairs"
-        },
-        {
-            "objectId": "fan",
-            "locationId": "sky light of main stairway"
-        },
-        {
-            "objectId": "woodenChair",
-            "locationId": "middle of long bottom room"
-        },
-        {
-            "objectId": "tu95",
-            "locationId": "in corner of checker corner room"
-        },
-        {
-            "objectId": "woodenRoomDivider",
-            "locationId": "back of room of tight doorway room"
-        },
-        {
-            "objectId": "coffeeTable",
-            "locationId": "top flight of main stairway"
-        },
-        {
-            "objectId": "barrels",
-            "locationId": "bottom corner of corner room with stairs"
-        },
-        {
-            "objectId": "radio",
-            "locationId": "facing archway door of small corner room"
-        },
-        {
-            "objectId": "medicalKit",
-            "locationId": "middle of small boring room"
-        },
-        {
-            "objectId": "portableFusionReactor",
             "locationId": "archway into light and dark room of checker corner room"
         },
         {
-            "objectId": "grenadeCrate",
-            "locationId": "base of stairs of main stairway"
+            "objectId": "fan",
+            "locationId": "corner of top light room"
+        },
+        {
+            "objectId": "woodenChair",
+            "locationId": "by stairs of top hallway"
+        },
+        {
+            "objectId": "woodenRoomDivider",
+            "locationId": "middle of hallway of top hallway"
+        },
+        {
+            "objectId": "tu95",
+            "locationId": "by narrow door room of top hallway"
         },
         {
             "objectId": "metalBarrel",
-            "locationId": "dark side of light and dark room"
+            "locationId": "base of stairs of main stairway"
+        },
+        {
+            "objectId": "medicalKit",
+            "locationId": "bottom corner of corner room with stairs"
+        },
+        {
+            "objectId": "grenadeCrate",
+            "locationId": "middle flight of main stairway"
+        },
+        {
+            "objectId": "barrels",
+            "locationId": "in corner of checker corner room"
+        },
+        {
+            "objectId": "woodenTable",
+            "locationId": "facing archway door of small corner room"
         }
     ]
 }

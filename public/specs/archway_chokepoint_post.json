@@ -1,64 +1,76 @@
 {
   "name": "Wine Cellar Labyrinth – WC-A3 Run",
-  "description": "Inspired by forum discussions about the nightmare maneuver through the tight brick archway WC-A3, this level starts the pilot at the cellar entrance, forces them past long rows of racks and through the infamous arch (checkpoint 1), then deeper into a light-starved alcove (checkpoint 2) before finally winding out through another constricted doorway to the hidden back room. Dim lighting, cool cellar air and gusty cross-drafts heighten the difficulty. Barrels and a half-collapsed wooden divider narrow the approach to the arch, while assorted mansion clutter provides plenty of collision hazards elsewhere.",
-  "environmentTemperature": 60,
+  "description": "Navigate a drone from the cellar stairwell, weave past the barrel racks, squeeze through the brutally narrow brick archway WC-A3, and reach the hidden alcove beyond. The level recreates the low-lit, stone-walled cellar complete with unpredictable drafts: a ceiling fan high above the stairwell produces momentary gusts that funnel down the passage, jostling the drone just as it threads the arch. Several old wine barrels tilt toward the flight path, and a half-collapsed wooden room divider sits precariously in one of the adjoining corridors—any hard bump ends the mission as the divider ‘destabilises the structure’. Extra clutter (tables, chairs, crates) makes every corner tight and sensor readings noisy.",
+  "environmentTemperature": 55,
   "pingDelay": 75,
   "windEnabled": true,
   "lightingLevel": 0.4,
   "checkpoint_locationIds": [
-    "archway into light and dark room of checker corner room",
-    "dark side of light and dark room"
+    "corner entrance of long bottom room",
+    "middle of long bottom room"
   ],
-  "startpoint_locationId": "corner entrance of long bottom room",
-  "endpoint_locationId": "back of room of tight doorway room",
+  "startpoint_locationId": "base of stairs of corner room with stairs",
+  "endpoint_locationId": "in corner of checker corner room",
   "objects": [
-    {
-      "objectId": "barrels",
-      "locationId": "facing archway door of small corner room"
-    },
     {
       "objectId": "barrels",
       "locationId": "bottom corner of corner room with stairs"
     },
     {
+      "objectId": "barrels",
+      "locationId": "middle flight of corner room with stairs"
+    },
+    {
       "objectId": "woodenRoomDivider",
-      "locationId": "in corner of checker corner room"
+      "locationId": "archway into light and dark room of checker corner room"
     },
     {
       "objectId": "metalBarrel",
-      "locationId": "middle of long bottom room"
+      "locationId": "middle of tile bathroom"
     },
     {
-      "objectId": "fan",
-      "locationId": "corner of top light room"
-    },
-    {
-      "objectId": "portableFusionReactor",
-      "locationId": "sky light of main stairway"
-    },
-    {
-      "objectId": "radio",
-      "locationId": "middle of small boring room"
+      "objectId": "metalBarrel",
+      "locationId": "middle flight of main stairway"
     },
     {
       "objectId": "woodenTable",
-      "locationId": "middle of tile bathroom"
+      "locationId": "light side of light and dark room"
+    },
+    {
+      "objectId": "woodenChair",
+      "locationId": "dark side of light and dark room"
     },
     {
       "objectId": "coffeeTable",
       "locationId": "doorway of top light room"
     },
     {
-      "objectId": "woodenChair",
-      "locationId": "by stairs of top hallway"
+      "objectId": "fan",
+      "locationId": "sky light of main stairway"
     },
     {
-      "objectId": "grenadeCrate",
-      "locationId": "middle flight of main stairway"
+      "objectId": "barrels",
+      "locationId": "top flight of main stairway"
+    },
+    {
+      "objectId": "woodenChair",
+      "locationId": "middle of small boring room"
     },
     {
       "objectId": "medicalKit",
-      "locationId": "by narrow door room of top hallway"
+      "locationId": "by window of top big light room"
+    },
+    {
+      "objectId": "marbleTable",
+      "locationId": "middle of hallway of top hallway"
+    },
+    {
+      "objectId": "grenadeCrate",
+      "locationId": "back of room of tight doorway room"
+    },
+    {
+      "objectId": "woodenRoomDivider",
+      "locationId": "by tight door of tight doorway room"
     }
   ]
 }
