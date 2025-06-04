@@ -56,6 +56,8 @@ export default class Level {
   windChangeTimer: number;
   windChangeInterval: number;
 
+  initialPingDelay: number;
+  pingDelayRange: number;
   pingDelay: number; // milliseconds
   inputBuffer: Array<{
     timestamp: number;
@@ -192,7 +194,9 @@ export default class Level {
 
     // ping delay
     // this.pingDelay = Math.random() * 50 + 50; // 50-100ms
-    this.pingDelay = this.spec.pingDelay;
+    this.initialPingDelay = this.spec.pingDelay;
+    this.pingDelay = this.initialPingDelay;
+    this.pingDelayRange = 20;
     this.inputBuffer = [];
     this.pingChangeTimer = 0;
     this.pingChangeInterval = 3; // change ping every 3 seconds
@@ -819,7 +823,8 @@ export default class Level {
 
     if (this.pingChangeTimer >= this.pingChangeInterval) {
       // Generate new ping value between 50-100ms
-      this.pingDelay = Math.random() * 50 + 50;
+      this.pingDelay =
+        Math.random() * this.pingDelayRange + this.initialPingDelay;
       this.pingChangeTimer = 0;
     }
   }
