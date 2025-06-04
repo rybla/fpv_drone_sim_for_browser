@@ -1,0 +1,35 @@
+{
+    "id": "archway_chokepoint_post",
+    "authorId": "RotorHead_Riq",
+    "title": "Archway Chokepoint",
+    "body": "Has anyone else been consistently losing birds (simulated, of course) at that one ridiculously tight brick archway in the \"Wine Cellar Labyrinth\" scenario? The one just past the main rack rows, leading to what I *think* is the \"hidden alcove\" objective. The clearance is wafer-thin, and there's always some junk partially blocking it. Yesterday it was a couple of old **Barrels** leaning against the frame.",
+    "likes": 0,
+    "dislikes": 0,
+    "comments": [
+        {
+            "id": "c1",
+            "authorId": "GhostFlight",
+            "body": "RotorHead_Riq wrote:\nHas anyone else been consistently losing birds (simulated, of course) at that one ridiculously tight brick archway in the \"Wine Cellar Labyrinth\" scenario?\n\nYou're not alone, Riq. That archway is a menace. I swear the air currents in the sim get weirdly unpredictable right at the threshold. One moment you're stable, the next you're being sucked towards the brickwork. I had a clean approach lined up, then a simulated gust pushed me right into the side. Scraped the paint, and nearly lost a prop. The **Barrels** were an issue for me too – had to thread the needle between one and the arch itself."
+        },
+        {
+            "id": "c2",
+            "authorId": "Pathfinder_Priya",
+            "body": "Oh, *that* archway. My nemesis. It wasn't **Barrels** for me, but a half-collapsed **Wooden Room Divider** that was propped up just inside the passage. Barely visible on approach due to the dim lighting, and my LIDAR just painted it as part of the wall until I was practically on top of it. Tried to punch through thinking I had clearance... ended up with a \"mission critical failure\" screen. The sim said I \"destabilized critical structural element.\" Oops."
+        },
+        {
+            "id": "c3",
+            "authorId": "RotorHead_Riq",
+            "body": "Pathfinder_Priya wrote:\n...a half-collapsed Wooden Room Divider that was propped up just inside the passage.\n\nSee! It's always something different. Makes pre-planning the ingress a nightmare. I'm wondering if the collision model on our drone avatars is a bit too generous around the prop guards in the sim. I felt like I should have cleared those **Barrels**, but the sim registered a hit."
+        },
+        {
+            "id": "c4",
+            "authorId": "SimTester_03",
+            "body": "Operators, your feedback on the \"Wine Cellar\" archway (Designator: WC-A3) is noted. The dynamic placement of obstructions like the **Barrels** and the **Wooden Room Divider** is intended to simulate unpredictable field conditions and test adaptive piloting.\n\nWe are reviewing telemetry from failed attempts at WC-A3 to assess the simulated air currents and the drone's collision physics in tight confines. The goal is realism, including the \"pucker factor\" of such maneuvers.\n\nPathfinder_Priya – the \"destabilized critical structural element\" is a specific failure condition for that scenario if certain objects are disturbed too aggressively. It's not just about crashing the drone.\n\nKeep the feedback coming."
+        },
+        {
+            "id": "c5",
+            "authorId": "GhostFlight",
+            "body": "Good to hear it's being looked at. Maybe a slight enhancement to the short-range obstacle avoidance tones when approaching such tight chokepoints? The visual feed can get a bit grainy in those low-light cellar conditions. That **Wooden Room Divider** sounds like a particularly nasty surprise."
+        }
+    ]
+}

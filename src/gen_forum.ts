@@ -18,7 +18,11 @@ export const PostCommentSchema = z.object({
     .describe(
       "The id of the comment's author. Can only use letters, numbers, and underscores.",
     ),
-  body: z.string().describe("The text content of the comment."),
+  body: z
+    .string()
+    .describe(
+      "The text content of the comment. Must be plain text; CANNOT use Markdown.",
+    ),
 });
 
 export type PostComment = z.infer<typeof PostCommentSchema>;
@@ -35,7 +39,11 @@ export const PostSchema = z.object({
       "The id of the post's author. Can only use letters, numbers, and underscores.",
     ),
   title: z.string().describe("The main title of the post."),
-  body: z.string().describe("The main text content of the post."),
+  body: z
+    .string()
+    .describe(
+      "The main text content of the post. Must be plain text; CANNOT use Markdown.",
+    ),
   likes: z
     .number()
     .int()
@@ -71,13 +79,18 @@ async function genPost(prompt: string) {
   });
 
   const post: Post = response.output_parsed!;
-  await fs.writeFile(`${post.id}.json`, JSON.stringify(post, null, 4), {
-    encoding: "utf8",
-  });
+  await fs.writeFile(
+    `forum_posts/${post.id}.json`,
+    JSON.stringify(post, null, 4),
+    {
+      encoding: "utf8",
+    },
+  );
 }
 
 async function main() {
   const filenames = await fs.readdir("forum_prompts");
+  await fs.mkdir("forum_posts");
   await Promise.all(
     filenames.map(async (fn) => {
       console.log(`start generating post for ${fn} ...`);

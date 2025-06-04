@@ -1,0 +1,17 @@
+barrels
+barrier
+coffeeTable
+dynamite
+fan
+grenadeCrate
+mansion
+marbleTable
+medicalKit
+metalBarrel
+portableFusionReactor
+radio
+tank
+tu95
+woodenChair
+woodenRoomDivider
+woodenTable
