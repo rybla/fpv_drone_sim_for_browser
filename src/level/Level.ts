@@ -97,7 +97,14 @@ export default class Level {
     batteryDrainMultiplier: 1.0,
     infiniteBattery: false,
     showCoordinates: false,
+    videoInterferenceEnabled: false,
   };
+
+  videoInterferenceQuad?: THREE.Mesh;
+  videoInterferenceMaterial?: THREE.ShaderMaterial;
+  interferenceTimer: number = 0;
+  interferenceActive: boolean = false;
+  nextInterferenceTime: number = 0;
 
   lateralTuning = {
     maxAccel: 12, // horizontal accel cap  (m s⁻²)
@@ -251,6 +258,70 @@ export default class Level {
     this.scene.environment = skybox; // lets reflective materials pick it up
   }
 
+  createVideoInterference() {
+    const vertexShader = `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = vec4(position, 1.0);
+      }
+    `;
+
+    const fragmentShader = `
+      uniform float time;
+      uniform float intensity;
+      varying vec2 vUv;
+
+      float random(vec2 st) {
+        return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+      }
+
+      void main() {
+        vec2 uv = vUv;
+
+        // Horizontal scan lines
+        float scanline = sin(uv.y * 800.0 + time * 10.0) * 0.04;
+        uv.y += scanline * intensity;
+
+        // Random noise
+        float noise = random(uv + time) * 0.1;
+
+        // Color distortion
+        float r = random(vec2(time * 0.1, uv.y));
+        float g = random(vec2(time * 0.2, uv.y));
+        float b = random(vec2(time * 0.3, uv.y));
+
+        vec3 color = vec3(r, g, b) * noise * intensity;
+
+        // Glitch blocks
+        float blockNoise = step(0.99, random(floor(uv * 10.0) + time));
+        color += vec3(blockNoise) * intensity;
+
+        gl_FragColor = vec4(color, intensity * 0.3);
+      }
+    `;
+
+    this.videoInterferenceMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0 },
+        intensity: { value: 0 },
+      },
+      vertexShader,
+      fragmentShader,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    });
+
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    this.videoInterferenceQuad = new THREE.Mesh(
+      geometry,
+      this.videoInterferenceMaterial,
+    );
+    this.videoInterferenceQuad.frustumCulled = false;
+    this.videoInterferenceQuad.renderOrder = 999;
+  }
+
   createFloor() {
     const floorSize = 10000;
     const floorTexture = this.textureLoader.load("/floor.png");
@@ -342,6 +413,7 @@ export default class Level {
     });
 
     this.drone = await createNanodrone(this);
+    this.createVideoInterference();
     const startPos = this.drone.body.translation();
     this.targetPosition.set(startPos.x, 0, startPos.z);
     this.targetAltitude = startPos.y;
@@ -402,6 +474,7 @@ export default class Level {
     this.updateCheckpoints();
     this.updateGraphics(deltaTime);
     this.updateHUD(deltaTime);
+    this.updateVideoInterference(deltaTime);
   }
 
   updateAfterRender(_deltaTime: number): void {}
@@ -848,6 +921,45 @@ export default class Level {
     }
   }
 
+  updateVideoInterference(deltaTime: number): void {
+    if (
+      !this.settings.videoInterferenceEnabled ||
+      !this.videoInterferenceMaterial
+    ) {
+      if (this.videoInterferenceQuad && this.videoInterferenceQuad.parent) {
+        this.scene.remove(this.videoInterferenceQuad);
+      }
+      return;
+    }
+
+    this.interferenceTimer += deltaTime;
+
+    // Schedule next interference
+    if (this.interferenceTimer >= this.nextInterferenceTime) {
+      this.interferenceActive = !this.interferenceActive;
+
+      if (this.interferenceActive) {
+        // Start interference
+        this.scene.add(this.videoInterferenceQuad!);
+        this.nextInterferenceTime =
+          this.interferenceTimer + Math.random() + 0.1; // 0.1-1.1s duration
+      } else {
+        // Stop interference
+        this.scene.remove(this.videoInterferenceQuad!);
+        this.nextInterferenceTime =
+          this.interferenceTimer + Math.random() * 15 + 5; // 5-20s between interferences
+      }
+    }
+
+    // Update shader
+    if (this.interferenceActive) {
+      this.videoInterferenceMaterial.uniforms.time.value =
+        this.interferenceTimer;
+      const intensity = Math.random() * 0.5 + 0.3; // 0.3-0.8 intensity
+      this.videoInterferenceMaterial.uniforms.intensity.value = intensity;
+    }
+  }
+
   updateBattery(deltaTime: number): void {
     if (this.settings.infiniteBattery) {
       this.batteryLevel = 100;
@@ -1118,6 +1230,14 @@ export default class Level {
       this.settings.showCoordinates = coordinatesToggle.checked;
     });
 
+    // Video Interference
+    const videoInterferenceToggle = document.getElementById(
+      "video-interference-toggle",
+    ) as HTMLInputElement;
+    videoInterferenceToggle?.addEventListener("change", () => {
+      this.settings.videoInterferenceEnabled = videoInterferenceToggle.checked;
+    });
+
     // Reset to defaults
     const resetButton = document.getElementById("reset-defaults");
     resetButton?.addEventListener("click", () => {
@@ -1136,6 +1256,7 @@ export default class Level {
         batteryDrainMultiplier: 1.0,
         infiniteBattery: false,
         showCoordinates: false,
+        videoInterferenceEnabled: true,
       };
 
       // Update all UI elements
@@ -1168,6 +1289,9 @@ export default class Level {
       (
         document.getElementById("coordinates-toggle") as HTMLInputElement
       ).checked = false;
+      (
+        document.getElementById("video-interference-toggle") as HTMLInputElement
+      ).checked = true;
 
       // Apply settings
       this.applySettings(this.settings);
