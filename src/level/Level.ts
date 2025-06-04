@@ -3,8 +3,9 @@ import * as THREE from "three";
 import * as config from "../config";
 import { createCheckpoint, type Checkpoint } from "../environment/checkpoint";
 import { createNanodrone } from "../environment/nanodrone";
-import type { Spec } from "../spec";
+import type { LocationId, ObjectId, Spec } from "../spec";
 import { createMansion } from "../environment/mansion";
+import { createBarrels } from "../environment/barrels";
 
 export type Controls = {
   throttle: number;
@@ -18,6 +19,78 @@ export type Drone = {
   group: THREE.Group;
   propellers: THREE.Object3D[];
   collider: RAPIER.Collider;
+};
+
+export const locationVectors: { [key in LocationId]: THREE.Vector3 } = {
+  "bottom corner of corner room with stairs": new THREE.Vector3(-3.4, 1.0, 0.1),
+  "base of stairs of corner room with stairs": new THREE.Vector3(
+    17.0,
+    1.2,
+    -9.2,
+  ),
+  "middle flight of corner room with stairs": new THREE.Vector3(
+    10.1,
+    13.0,
+    -27.9,
+  ),
+  "top of stairs of corner room with stairs": new THREE.Vector3(
+    0.2,
+    19.1,
+    -3.4,
+  ),
+  "corner entrance of long bottom room": new THREE.Vector3(26.6, 1.0, -6.7),
+  "middle of long bottom room": new THREE.Vector3(35.8, 7.2, -15.3),
+  "facing archway door of small corner room": new THREE.Vector3(
+    74.7,
+    3.7,
+    -1.3,
+  ),
+  "dark side of light and dark room": new THREE.Vector3(51.5, 32, -22.7),
+  "light side of light and dark room": new THREE.Vector3(83.4, 2.5, -21.8),
+  "in corner of checker corner room": new THREE.Vector3(78.1, 3.0, -52.0),
+  "archway into light and dark room of checker corner room": new THREE.Vector3(
+    74.9,
+    2.1,
+    -38.2,
+  ),
+  "base of stairs of main stairway": new THREE.Vector3(49.7, 1.7, -39.1),
+  "middle flight of main stairway": new THREE.Vector3(28.2, 10.6, -33.9),
+  "top flight of main stairway": new THREE.Vector3(47.5, 22.0, -30.7),
+  "sky light of main stairway": new THREE.Vector3(40.2, 30.6, -34.8),
+  "middle of small boring room": new THREE.Vector3(53.0, 4.2, -51.3),
+  "middle of tile bathroom": new THREE.Vector3(31.9, 10.7, -53.1),
+  "middle of top boring room": new THREE.Vector3(50.7, 21.8, -51.8),
+  "corner of top light room": new THREE.Vector3(80.5, 19.9, -56.4),
+  "doorway of top light room": new THREE.Vector3(66.1, 18.8, -42.2),
+  "by stairs of top hallway": new THREE.Vector3(58.7, 18.5, -36.1),
+  "by narrow door room of top hallway": new THREE.Vector3(58.9, 18.4, -4.1),
+  "middle of hallway of top hallway": new THREE.Vector3(37.1, 19.7, -2.3),
+  "by window of top big light room": new THREE.Vector3(85.6, 18.1, -22.4),
+  "by door of top big light room": new THREE.Vector3(65.8, 19.7, -23.9),
+  "back of room of tight doorway room": new THREE.Vector3(74.9, 17.0, -3.3),
+  "by tight door of tight doorway room": new THREE.Vector3(65.3, 20.9, -7.5),
+};
+
+export const objectCreators: {
+  [key in ObjectId]: (level: Level, pos: THREE.Vector3) => Promise<void>;
+} = {
+  barrels: createBarrels,
+  barrier: createBarrels,
+  coffeeTable: createBarrels,
+  dynamite: createBarrels,
+  fan: createBarrels,
+  grenadeCrate: createBarrels,
+  mansion: createBarrels,
+  marbleTable: createBarrels,
+  medicalKit: createBarrels,
+  metalBarrel: createBarrels,
+  portableFusionReactor: createBarrels,
+  radio: createBarrels,
+  tank: createBarrels,
+  tu95: createBarrels,
+  woodenChair: createBarrels,
+  woodenRoomDivider: createBarrels,
+  woodenTable: createBarrels,
 };
 
 export default class Level {
@@ -189,10 +262,12 @@ export default class Level {
     this.targetWindVector = new THREE.Vector3(0, 0, 0);
     this.windChangeTimer = 0;
     this.windChangeInterval = 8; // seconds between wind target changes
+    // FROM SPEC: set windEnabled
     this.settings.windEnabled = this.spec.windEnabled;
 
     // temperature
     // this.environmentTemperature = 70; // Starting at 70°F
+    // FROM SPEC: set environmentTemperature
     this.environmentTemperature = this.spec.environmentTemperature;
     this.targetEnvironmentTemperature = 70;
     this.environmentTemperatureChangeTimer = 0;
@@ -200,6 +275,7 @@ export default class Level {
 
     // ping delay
     // this.pingDelay = Math.random() * 50 + 50; // 50-100ms
+    // FROM SPEC: set pingDelay
     this.pingDelay = this.spec.pingDelay;
     this.inputBuffer = [];
     this.pingChangeTimer = 0;
@@ -207,26 +283,8 @@ export default class Level {
 
     // create stuff
     this.createLighting();
-    this.createFloor();
+    // this.createFloor();
     this.createSkybox();
-
-    // TODO: startpoint
-    this.spec.startpoint_locationId;
-
-    // TODO: endpoint
-    this.spec.endpoint_locationId;
-
-    // checkpoints
-    for (const _locationId of this.spec.checkpoint_locationIds) {
-      // TODO: use map of locationId => Vector3
-    }
-
-    // TODO: remove example checkpoint once can do the above thing
-    const cp = createCheckpoint(this, new THREE.Vector3(2, 1, -2));
-    this.checkpoints.push(cp);
-
-    // TODO: place objects
-    this.spec.objects;
   }
 
   createSkybox() {
@@ -412,14 +470,44 @@ export default class Level {
       this.togglePause();
     });
 
-    this.drone = await createNanodrone(this);
     this.createVideoInterference();
+
+    this.drone = await createNanodrone(this);
+    // FROM SPEC: set drone's position to start position
+    const startpointVector = locationVectors[this.spec.startpoint_locationId];
+    this.drone.body.setTranslation(
+      new RAPIER.Vector3(
+        startpointVector.x,
+        startpointVector.y,
+        startpointVector.z,
+      ),
+      true,
+    );
     const startPos = this.drone.body.translation();
     this.targetPosition.set(startPos.x, 0, startPos.z);
     this.targetAltitude = startPos.y;
 
     await createMansion(this, new THREE.Vector3(1, 0.2, 1));
+
     this.setupSettingsMenu();
+
+    // FROM SPEC: TODO
+    this.spec.startpoint_locationId;
+
+    // FROM SPEC: TODO
+    this.spec.endpoint_locationId;
+
+    // FROM SPEC: set create checkpoints
+    for (const locationId of this.spec.checkpoint_locationIds) {
+      this.checkpoints.push(
+        createCheckpoint(this, locationVectors[locationId]),
+      );
+    }
+
+    // FROM SPEC: create objects
+    for (const o of this.spec.objects) {
+      await objectCreators[o.objectId](this, locationVectors[o.locationId]);
+    }
   }
 
   start(): void {
@@ -787,7 +875,15 @@ export default class Level {
 
     // Reset position (immediate, no delay)
     if (this.keys["r"]) {
-      this.drone!.body.setTranslation({ x: 0, y: 1, z: 0 }, true);
+      const startpointVector = locationVectors[this.spec.startpoint_locationId];
+      this.drone!.body.setTranslation(
+        new RAPIER.Vector3(
+          startpointVector.x,
+          startpointVector.y,
+          startpointVector.z,
+        ),
+        true,
+      );
       this.drone!.body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
       this.drone!.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
       this.drone!.body.setAngvel({ x: 0, y: 0, z: 0 }, true);

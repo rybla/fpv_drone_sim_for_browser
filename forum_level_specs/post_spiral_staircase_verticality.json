@@ -1,0 +1,33 @@
+{
+    "name": "Grand Library Spiral Ascent",
+    "description": "A vertical precision-flying challenge set in the mansion’s multi-storey library. The player must guide the drone up a very tight spiral staircase that wraps around floor-to-ceiling bookshelves. Visual depth cues are distorted by the drone’s fisheye lens and the warm, low lighting. 1) Entry Challenge – a rusted metal barrel partly blocks the stairwell entrance, forcing a quick lift-over manoeuvre while remaining inside the narrow door frame. 2) Tight Confines – the inner banister and outer masonry leave only centimetres of margin; continuous roll and yaw coordination are required throughout the climb. 3) Air Currents – a ceiling ventilation fan halfway up produces intermittent upward gusts that push the drone outward, demanding constant corrective thrust. 4) Major Obstacle – three-quarters of the way up, an idle but massive portable fusion reactor has been parked on the landing, shrinking the passage to a sliver and obliging careful altitude and lateral micro-adjustments. 5) Final Obstruction – at the top, a tall wooden room divider has toppled against the rail, partly blocking the exit aperture. The drone must thread past the divider and burst through the skylight opening to clear the level. Completing all checkpoints and reaching the skylight without collision completes the mission.",
+    "environmentTemperature": 68,
+    "pingDelay": 75,
+    "windEnabled": true,
+    "lightingLevel": 0.8,
+    "checkpoint_locationIds": [
+        "base of stairs of main stairway",
+        "middle flight of main stairway",
+        "top flight of main stairway"
+    ],
+    "startpoint_locationId": "base of stairs of main stairway",
+    "endpoint_locationId": "sky light of main stairway",
+    "objects": [
+        {
+            "objectId": "metalBarrel",
+            "locationId": "base of stairs of main stairway"
+        },
+        {
+            "objectId": "fan",
+            "locationId": "middle flight of main stairway"
+        },
+        {
+            "objectId": "portableFusionReactor",
+            "locationId": "top flight of main stairway"
+        },
+        {
+            "objectId": "woodenRoomDivider",
+            "locationId": "sky light of main stairway"
+        }
+    ]
+}

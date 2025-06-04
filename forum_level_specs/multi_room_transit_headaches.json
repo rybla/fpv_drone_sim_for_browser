@@ -1,0 +1,32 @@
+{
+    "name": "Master Suite IED Scan",
+    "description": "Fly a small recon-drone from the brightly lit master bathroom, skim low over a reflective marble table that scrambles the altimeter, slip through two successive doorways into an intentionally dimmer bedroom where a ceiling fan’s down-wash pushes the drone off course, and finally thread the craft into a cramped, clutter-filled dressing room. Inside the dressing room, avoid clipping a toy TU-95 model aircraft sitting on a shelf just inside the door and a wooden chair tucked beneath a low vanity while completing your scan. Signal strength drops steadily as you penetrate deeper, so hit the two interior checkpoints quickly and then exfiltrate. Battery life, changing light levels, fan-generated turbulence, and tight clearances provide continuous pressure.",
+    "environmentTemperature": 68,
+    "pingDelay": 80,
+    "windEnabled": true,
+    "lightingLevel": 0.8,
+    "checkpoint_locationIds": [
+        "by window of top big light room",
+        "back of room of tight doorway room"
+    ],
+    "startpoint_locationId": "middle of tile bathroom",
+    "endpoint_locationId": "back of room of tight doorway room",
+    "objects": [
+        {
+            "objectId": "marbleTable",
+            "locationId": "middle of tile bathroom"
+        },
+        {
+            "objectId": "fan",
+            "locationId": "by window of top big light room"
+        },
+        {
+            "objectId": "tu95",
+            "locationId": "by tight door of tight doorway room"
+        },
+        {
+            "objectId": "woodenChair",
+            "locationId": "back of room of tight doorway room"
+        }
+    ]
+}

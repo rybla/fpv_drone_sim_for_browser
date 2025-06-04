@@ -1,0 +1,45 @@
+{
+    "name": "Wine Cellar Labyrinth – Archway Chokepoint WC-A3",
+    "description": "Inspired by the user’s scenario, this level recreates a dim, cramped wine-cellar maze whose main trial is squeezing a drone through the brick archway WC-A3. The path starts deep in the rack aisles (long bottom room), forces the pilot to line up perfectly with the choke-point archway (mapped to the “archway into light and dark room of checker corner room”), and finishes in a hidden alcove beyond (dark side of light and dark room). Leaning wine barrels and an unstable wooden divider partially block the archway, and a ventilation fan hidden in the ceiling produces short, sideways gusts. Low lighting, increased network latency, and cooler cellar air complete the challenge. Touch every checkpoint in order to succeed; brushing either the barrels or divider triggers harsh collision physics, so absolute precision is required.",
+    "environmentTemperature": 58,
+    "pingDelay": 90,
+    "windEnabled": true,
+    "lightingLevel": 0.35,
+    "checkpoint_locationIds": [
+        "corner entrance of long bottom room",
+        "middle of long bottom room",
+        "archway into light and dark room of checker corner room"
+    ],
+    "startpoint_locationId": "middle of long bottom room",
+    "endpoint_locationId": "dark side of light and dark room",
+    "objects": [
+        {
+            "objectId": "barrels",
+            "locationId": "archway into light and dark room of checker corner room"
+        },
+        {
+            "objectId": "woodenRoomDivider",
+            "locationId": "archway into light and dark room of checker corner room"
+        },
+        {
+            "objectId": "fan",
+            "locationId": "archway into light and dark room of checker corner room"
+        },
+        {
+            "objectId": "barrels",
+            "locationId": "corner entrance of long bottom room"
+        },
+        {
+            "objectId": "metalBarrel",
+            "locationId": "middle of long bottom room"
+        },
+        {
+            "objectId": "radio",
+            "locationId": "dark side of light and dark room"
+        },
+        {
+            "objectId": "medicalKit",
+            "locationId": "dark side of light and dark room"
+        }
+    ]
+}

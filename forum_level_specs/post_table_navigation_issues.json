@@ -1,0 +1,27 @@
+{
+    "name": "Grand Library Table Navigation",
+    "description": "Navigate a tight, low-clearance space beneath a massive antique reading table in the mansion’s Grand Library. The drone starts at the doorway, slips under the table to scan intel lying beside an old floor-standing radio, then escapes—careful not to bump the radio or a half-pushed-in chair that blocks the straight exit route.",
+    "environmentTemperature": 68,
+    "pingDelay": 75,
+    "windEnabled": false,
+    "lightingLevel": 0.45,
+    "checkpoint_locationIds": [
+        "middle of long bottom room"
+    ],
+    "startpoint_locationId": "corner entrance of long bottom room",
+    "endpoint_locationId": "corner entrance of long bottom room",
+    "objects": [
+        {
+            "objectId": "woodenTable",
+            "locationId": "middle of long bottom room"
+        },
+        {
+            "objectId": "radio",
+            "locationId": "middle of long bottom room"
+        },
+        {
+            "objectId": "woodenChair",
+            "locationId": "middle of long bottom room"
+        }
+    ]
+}
