@@ -116,12 +116,12 @@ export async function createNanodrone(level: Level): Promise<Drone> {
     droneBody,
   );
 
-  const geometry = new THREE.BoxGeometry(0.52, 0.075, 0.52);
-  const edges = new THREE.EdgesGeometry(geometry);
-  const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-  const line = new THREE.LineSegments(edges, material);
-  geometry.dispose();
-  droneGroup.add(line);
+  // const geometry = new THREE.BoxGeometry(0.52, 0.075, 0.52);
+  // const edges = new THREE.EdgesGeometry(geometry);
+  // const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+  // const line = new THREE.LineSegments(edges, material);
+  // geometry.dispose();
+  // droneGroup.add(line);
 
   level.scene.add(droneGroup);
 

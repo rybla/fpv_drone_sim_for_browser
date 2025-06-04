@@ -596,13 +596,26 @@ export default class Level {
       this.drone!.body.addForce(thrustVector, true);
 
       // Ground effect
-      const droneHeight = this.drone!.body.translation().y;
-      const groundEffectHeight = 0.3; // Effect range in meters
-      if (droneHeight < groundEffectHeight && droneHeight > 0) {
-        const effectStrength = (1 - droneHeight / groundEffectHeight) * 0.4;
+      const dronePos = this.drone!.body.translation();
+      const groundEffectHeight = 1.5; // Effect range in meters
+      const ray = new RAPIER.Ray(
+        { x: dronePos.x, y: dronePos.y, z: dronePos.z },
+        { x: 0, y: -1, z: 0 },
+      );
+      const hit = this.world.castRay(
+        ray,
+        groundEffectHeight,
+        true,
+        undefined,
+        undefined,
+        this.drone!.collider,
+      );
+      if (hit !== null && thrustMagnitude > 0) {
+        const distanceBelow = hit.timeOfImpact;
+        const effectStrength = (1 - distanceBelow / groundEffectHeight) * 4;
         const groundEffectForce = {
           x: 0,
-          y: thrustMagnitude * effectStrength,
+          y: thrustMagnitude + effectStrength,
           z: 0,
         };
         this.drone!.body.addForce(groundEffectForce, true);
