@@ -1,7 +1,6 @@
 Room name
     Location
 
-
 Corner room with stairs
     bottom corner: -3.4, 1.0, 0.1
     base of stairs: 17.0, 1.2, -9.2
