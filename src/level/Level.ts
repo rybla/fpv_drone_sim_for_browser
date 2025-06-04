@@ -1,10 +1,10 @@
 import RAPIER from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
 import * as config from "../config";
-import { createTU95 } from "../environment/tu95";
 import { createCheckpoint, type Checkpoint } from "../environment/checkpoint";
 import { createNanodrone } from "../environment/nanodrone";
 import type { Spec } from "../spec";
+import { createMansion } from "../environment/mansion";
 
 export type Controls = {
   throttle: number;
@@ -345,7 +345,7 @@ export default class Level {
     this.targetPosition.set(startPos.x, 0, startPos.z);
     this.targetAltitude = startPos.y;
 
-    await createTU95(this, new THREE.Vector3(15, 5, 5));
+    await createMansion(this, new THREE.Vector3(1, 0.2, 1));
     this.setupSettingsMenu();
   }
 
@@ -554,7 +554,7 @@ export default class Level {
         -this.controls.yaw *
           config.maxYawTorque *
           this.settings.yawSensitivity -
-        angVel.y * 0.01;
+        angVel.y * 0.002;
 
       const worldUp = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion);
 
