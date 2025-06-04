@@ -17,6 +17,7 @@ import { createWoodenChair } from "../environment/woodenChair";
 import { createWoodenRoomDivider } from "../environment/woodenRoomDivider";
 import { createWoodenTable } from "../environment/woodenTable";
 import type { LocationId, ObjectId, Spec } from "../spec";
+import { createMansion } from "../environment/mansion";
 
 export type Controls = {
   throttle: number;
@@ -492,8 +493,7 @@ export default class Level {
     this.targetPosition.set(startPos.x, 0, startPos.z);
     this.targetAltitude = startPos.y;
 
-    // TODO: re-enable this after testing
-    // await createMansion(this, new THREE.Vector3(1, 0.2, 1));
+    await createMansion(this, new THREE.Vector3(1, 0.2, 1));
 
     this.setupSettingsMenu();
 
