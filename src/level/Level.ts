@@ -564,7 +564,7 @@ export default class Level {
         (-this.controls.yaw *
           config.maxYawTorque *
           this.settings.yawSensitivity -
-          angVel.y * (Math.abs(this.controls.yaw) < 0.1 ? 0.2 : 0.002)) *
+          angVel.y * (Math.abs(this.controls.yaw) < 0.1 ? 0.02 : 0.002)) *
         2;
 
       const worldUp = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion);
